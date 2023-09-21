@@ -1,0 +1,32 @@
+// Here you can add other styles
+img {
+    width: 100%;
+    height: 300px;
+    object-fit: contain;
+}
+
+.otras {
+    width: 100%;
+    height: 100px;
+    object-fit: contain;
+}
+
+.princi {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.dropzone {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: 4px dashed rgb(117, 112, 112);
+    height: 20rem;
+}
+
+.link {
+    text-decoration: none;
+    color: black;
+}
