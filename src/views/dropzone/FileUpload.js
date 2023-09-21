@@ -1,16 +1,16 @@
 import { CImg } from '@coreui/react';
 import React, { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-const FileUpload = () => {
+const FileUpload = (modo) => {
     const [files, setFiles] = useState([]);
 
     const onDrop = (acceptedFiles => {
-        if(acceptedFiles.length = 1 && (acceptedFiles[0].type === "image/jpg" || acceptedFiles[0].type === "image/png" || acceptedFiles[0].type === "image/jpeg")) {
+      if(acceptedFiles.length = 1 && (acceptedFiles[0].type === "image/jpg" || acceptedFiles[0].type === "image/png" || acceptedFiles[0].type === "image/jpeg")) {
             setFiles(acceptedFiles.map(file => 
                 Object.assign(file, {preview: URL.createObjectURL(file)})    
             ));
-            console.log(acceptedFiles)
-        }        
+      }
+        
     })
     const { getRootProps, getInputProps, isDragActive } = useDropzone({onDrop})
 //TO DO : Customize and Style this Drag and Drop to Upload box as you want🧑 💻😊

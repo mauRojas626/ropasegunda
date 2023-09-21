@@ -45,6 +45,7 @@ const Comprados = React.lazy(() => import('./views/pages/principal/Comprados'));
 const Entrega = React.lazy(() => import('./views/pages/principal/SolicitudEnvio'));
 const Perfil = React.lazy(() => import('./views/pages/principal/InformacionUsuario'));
 const EnVenta = React.lazy(() => import('./views/pages/principal/EnVenta'));
+const Nuevo = React.lazy(() => import('./views/pages/principal/NuevaPrenda'));
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -94,7 +95,8 @@ const routes = [
   { path: '/principal/Comprados', exact: true, name: 'Comprados', component: Comprados },
   { path: '/principal/Entrega', exact: true, name: 'Entrega', component: Entrega },
   { path: '/perfil', exact: true, name: 'Perfil', component: Perfil },
-  { path: '/en-venta', exact: true, name: 'En Venta', component: EnVenta }
+  { path: '/en-venta', exact: true, name: 'En Venta', component: EnVenta },
+  { path: '/nuevo', exact: true, name: 'Nuevo', component: Nuevo }
 ];
 
 export default routes;

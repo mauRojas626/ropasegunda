@@ -83,7 +83,7 @@ export default class InformacionUsuario extends Component {
             </CCol>
             <CCol md="6" className="mb-4">
                 <h3>Medidas</h3>
-                <CFormGroup className="mt-4">
+                <CFormGroup className="mt-3">
                     <CLabel type='number'>Cintura (cm)</CLabel>
                     <CInput id="cintura" placeholder="Ingrese su medida de cintura" required />
                 </CFormGroup>
@@ -121,6 +121,10 @@ export default class InformacionUsuario extends Component {
                       Elige archivo...
                     </CLabel>
                   </CCol>
+                </CFormGroup>
+                <CFormGroup className="mt-4">
+                    <CLabel type='number'>Ruc NRUS</CLabel>
+                    <CInput id="ruc" placeholder="Ingrese su número de RUC" required />
                 </CFormGroup>
             </CCol>
         </CRow>
