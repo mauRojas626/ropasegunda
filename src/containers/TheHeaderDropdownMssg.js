@@ -10,7 +10,7 @@ import {
 import CIcon from '@coreui/icons-react'
 
 const TheHeaderDropdownMssg = () => {
-  const itemsCount = 4
+  const itemsCount = 2
   return (
     <CDropdown
       inNav
@@ -18,7 +18,7 @@ const TheHeaderDropdownMssg = () => {
       direction="down"
     >
       <CDropdownToggle className="c-header-nav-link" caret={false}>
-        <CIcon name="cil-envelope-open" /><CBadge shape="pill" color="info">{itemsCount}</CBadge>
+        <CIcon name="cil-bell" /><CBadge shape="pill" color="danger">{itemsCount}</CBadge>
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownItem
@@ -33,22 +33,21 @@ const TheHeaderDropdownMssg = () => {
             <div className="pt-3 mr-3 float-left">
               <div className="c-avatar">
                 <CImg
-                  src={'avatars/7.jpg'}
+                  src="https://http2.mlstatic.com/D_NQ_NP_720832-MPE48261251804_112021-O.webp"
                   className="c-avatar-img"
-                  alt="admin@bootstrapmaster.com"
+                  alt="saco rojo"
                 />
                 <span className="c-avatar-status bg-success"></span>
               </div>
             </div>
             <div>
-              <small className="text-muted">John Doe</small>
-              <small className="text-muted float-right mt-1">Just now</small>
+              <small className="text-muted">Saco Zara</small>
             </div>
             <div className="text-truncate font-weight-bold">
-              <span className="fa fa-exclamation text-danger"></span> Important message
+              <span className="fa fa-exclamation text-danger"></span> Confirmación de pago
             </div>
             <div className="small text-muted text-truncate">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
+              Haz click aqui para ver el estado de tu prenda. Recuerda que tienes 30 dias para cotizar el envío
             </div>
           </div>
         </CDropdownItem>
@@ -58,7 +57,7 @@ const TheHeaderDropdownMssg = () => {
             <div className="pt-3 mr-3 float-left">
               <div className="c-avatar">
                 <CImg
-                  src={'avatars/6.jpg'}
+                  src="https://lastraperas-public.imgix.net/items/64b8762b22ce520008503ff8/WhatsApp-Image-2023-08-25-at-1.19.34-PM_clipped_rev_1.png?h=345&auto=format"
                   className="c-avatar-img"
                   alt="admin@bootstrapmaster.com"
                 />
@@ -66,59 +65,13 @@ const TheHeaderDropdownMssg = () => {
               </div>
             </div>
             <div>
-              <small className="text-muted">Jane Dovve</small>
-              <small className="text-muted float-right mt-1">5 minutes ago</small>
+              <small className="text-muted">Ocasi.on</small>
             </div>
-            <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-            <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-            </div>
-          </div>
-        </CDropdownItem>
-
-        <CDropdownItem href="#">
-          <div className="message">
-            <div className="pt-3 mr-3 float-left">
-              <div className="c-avatar">
-                <CImg
-                  src={'avatars/5.jpg'}
-                  className="c-avatar-img"
-                  alt="admin@bootstrapmaster.com"
-                />
-                <span className="c-avatar-status bg-danger"></span>
-              </div>
-            </div>
-            <div>
-              <small className="text-muted">Janet Doe</small>
-              <small className="text-muted float-right mt-1">1:52 PM</small>
-            </div>
-            <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-            <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
+            <div className="font-weight-bold">Envío Cotizado</div>
+            <div className="small text-muted text-truncate">Haz click aquí para ver la cotización del envío. Recuerda que solo tienes 48 horas para realizar el pago
             </div>
           </div>
         </CDropdownItem>
-
-        <CDropdownItem href="#">
-          <div className="message">
-            <div className="pt-3 mr-3 float-left">
-              <div className="c-avatar">
-                <CImg
-                  src={'avatars/4.jpg'}
-                  className="c-avatar-img"
-                  alt="admin@bootstrapmaster.com"
-                />
-                <span className="c-avatar-status bg-info"></span>
-              </div>
-            </div>
-            <div>
-              <small className="text-muted">Joe Doe</small>
-              <small className="text-muted float-right mt-1">4:03 AM</small>
-            </div>
-            <div className="text-truncate font-weight-bold">Lorem ipsum dolor sit amet</div>
-            <div className="small text-muted text-truncate">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt...
-            </div>
-          </div>
-        </CDropdownItem>
-        <CDropdownItem href="#" className="text-center border-top"><strong>View all messages</strong></CDropdownItem>
       </CDropdownMenu>
     </CDropdown>
   )

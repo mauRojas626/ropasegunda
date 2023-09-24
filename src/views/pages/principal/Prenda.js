@@ -1,6 +1,8 @@
 import { CButton, CCard, CNav, CTabs, CCol, CImg, CRow, CNavItem,CNavLink, CTabContent, CTabPane, CDataTable, CInput, CInputGroupAppend, CInputGroup, CSelect } from '@coreui/react';
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
+import PrendaCard from './PrendaCard';
+import CIcon from '@coreui/icons-react';
 
 export default class Prenda extends Component {
     constructor(props){
@@ -16,7 +18,7 @@ export default class Prenda extends Component {
 
     render() {
         const fields = ['Tipo', 'Medida']
-        const medidaData = [{ Tipo: 'Cadera', Medida: 70 }, { Tipo: 'Cintura', Medida: 85 }]
+        const medidaData = [{ Tipo: 'Cadera', Medida: 80 }, { Tipo: 'Cintura', Medida: 75 }, { Tipo: 'Busto', Medida: 79 }, { Tipo: 'Largo Prenda', Medida: 65 }, { Tipo: 'Largo Manga', Medida: 60 }]
         return (
             <>
             <CRow>
@@ -34,12 +36,13 @@ export default class Prenda extends Component {
                     <CCard className="p-4 w-100">
                         <CCol>
                             <span>{this.props.location.state.prenda.vendedor}</span>
-                            <span style={{float: "right"}}> Estrellas: 4.5</span>
+                            <span style={{float: "right"}}> <CIcon name="cil-star"/> 4.5</span>
                             <h4>{this.props.location.state.prenda.nombre}</h4>
                             <h6>Talla: {this.props.location.state.prenda.talla}</h6>
                             <h6>S/ {this.props.location.state.prenda.precio}</h6>
                             <h6>Color: {this.props.location.state.prenda.color}</h6>
                             <h6>Marca: {this.props.location.state.prenda.marca}</h6>
+                            <h6>Material: {this.props.location.state.prenda.material}</h6>
                             <h6>Detalles: {this.props.location.state.prenda.detalles}</h6>
                             <br/>
                             <Link className="link" to={{pathname: "./Pago", state: {prenda: this.props.location.state.prenda}}}>
@@ -53,7 +56,7 @@ export default class Prenda extends Component {
                 </CCol>
             </CRow>
             <CRow className="mt-4">
-                <CCol  xs="12" sm="8" className="m-auto">
+                <CCol  xs="12" sm="8" className="m-top">
                     <CCard className="p-4 w-100">
                     <CTabs>
                         <CNav variant="tabs">
@@ -77,6 +80,8 @@ export default class Prenda extends Component {
                             <CTabPane>
                                 <CCol xs="12" md="11" className="m-3">
                                     <h3>Especificaciones</h3>
+
+                                    <h6>Medidas (cm)</h6>
                                     <CDataTable
                                     items={medidaData}
                                     fields={fields}
@@ -120,7 +125,7 @@ export default class Prenda extends Component {
                                         </CSelect>
                                     </CCol>
                                     <div className='m-3'>
-                                        <h5 style={{"margin-left": "40px" }}>Estrellas</h5>
+                                        <h5 style={{"margin-left": "40px" }}><CIcon name="cil-star"/> 4.5</h5>
                                         <span > Me llegó el producto el día de entrega temprano. Muy bonito el polo que compré y estaba en muy buenas condiciones y lavado</span>
                                         <CButton  small color='primary' variant="ghost" style={{"float": "right" }}>¿es util?</CButton>
                                     </div>
@@ -132,19 +137,7 @@ export default class Prenda extends Component {
                     </CCard>
                 </CCol>
                 <CCol  xs="12" sm="4" className="m-top">
-                    <CCard className="p-4 w-100">
-                        <CCol>
-                            <h5>Ocasi.on</h5>
-                            <h4>Saco Zara</h4>
-                            <h6>Talla: S</h6>
-                            <h6>S/ 45</h6>
-                            <h6>Detalles: Está un poco descosido por la parte de atrás. Ver tercera imagen</h6>
-                            <br/>
-                            <CButton color="primary">
-                                Comprar
-                            </CButton>
-                        </CCol>
-                    </CCard>
+                    <PrendaCard prenda={this.props.location.state.prenda} ></PrendaCard>
                 </CCol>
             </CRow>
             </>

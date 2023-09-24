@@ -1,10 +1,35 @@
 const _nav =  [
   {
     _tag: 'CSidebarNavItem',
-    name: 'Dashboard',
-    to: '/dashboard',
-    icon: 'cil-speedometer'
+    name: 'Mis prendas en venta',
+    to: '/en-venta',
+    icon: 'cil-user'
   },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Ropa comprada',
+    to: '/comprados',
+    icon: 'cil-user'
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Comprar',
+    to: '/prendas',
+    icon: 'cil-user'
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Datos Personales',
+    to: '/perfil',
+    icon: 'cil-user',
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    name: 'Administrar usuarios',
+    to: '/admin',
+    icon: 'cil-user',
+  }]
+  {/*,
   {
     _tag: 'CSidebarNavTitle',
     _children: ['Principal']
@@ -321,7 +346,6 @@ const _nav =  [
   {
     _tag: 'CSidebarNavDivider',
     className: 'm-2'
-  }
-]
+  */}
 
 export default _nav

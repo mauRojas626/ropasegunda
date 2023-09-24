@@ -1,4 +1,4 @@
-import { CButton, CTabPane, CCol, CRow, CNavItem, CNavLink, CTabContent, CTabs, CNav, CCard, CSelect, CCardHeader, CCollapse, CCardBody } from '@coreui/react'
+import { CButton, CTabPane, CCol, CRow, CNavItem, CNavLink, CTabContent, CTabs, CNav, CCard, CSelect, CCardHeader, CCollapse, CCardBody, CModalBody, CModalFooter, CModalHeader, CModalTitle, CModal, CCardImg, CFormGroup, CLabel, CInput } from '@coreui/react'
 import React, { Component } from 'react'
 import PrendasCardHorizontal from './PrendaCardHorizontal';
 import { Link } from 'react-router-dom';
@@ -7,10 +7,17 @@ export default class EnVenta extends Component {
     constructor(props){
         super(props);
         this.state = {
-            collapse: 0, 
+            collapse: 0,
+            validarPago: false,
+            cotizarEnvio: false
         }
     }
-
+    onClickVP = () => {
+        this.setState({validarPago: true})
+    }
+    onClickCE = () => {
+        this.setState({cotizarEnvio: true})
+    }
     render() {
     const prendaData = [
         {id: 0, nombre: "Saco Zara", precio: 45, talla: "S", color: "Rojo", detalles: "Tiene un descosido en la parte de atrás", marca: "Zara", sexo: 0, categoría: "saco", material: "tela", fotos: [{link: "https://http2.mlstatic.com/D_NQ_NP_720832-MPE48261251804_112021-O.webp"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Ocasi.on"},
@@ -21,7 +28,13 @@ export default class EnVenta extends Component {
     return (
         <>
         <h3>Prendas en venta</h3>
-        <CButton className="m-3" color='primary'>Nueva prenda</CButton>
+        <Link to="/nuevo">
+        <CButton className="m-3" color='primary'>
+            
+                Nueva prenda
+            
+        </CButton>
+        </Link>
         <CTabs>
             <CNav variant="tabs">
                 <CNavItem>
@@ -48,12 +61,12 @@ export default class EnVenta extends Component {
             <CTabContent>
                 <CTabPane>
                     <CCol xs="12" md="11" className="m-3">
-                        <h3>Pendientes</h3>
+                        <h3>Pendiente confirmar pago</h3>
                         <CRow>   
                             {prendaData.map(prenda => (
                                 <CCol md="6">
                                     <CCard>
-                                        <PrendasCardHorizontal prenda={prenda} modo={"enventa"}/>
+                                        <PrendasCardHorizontal prenda={prenda} modo={"enventa"} tipo="validar" onClick={this.onClickVP}/>
                                     </CCard>
                                 </CCol>
                             ))}  
@@ -62,7 +75,7 @@ export default class EnVenta extends Component {
                 </CTabPane>
                 <CTabPane>
                     <CCol xs="12" md="11" className="m-3">
-                        <h3>Preguntas realizadas</h3>
+                        <h3>Prendas en venta</h3>
                         <CRow>   
                             {prendaData.map(prenda => (
                                 <CCol md="6">
@@ -75,9 +88,9 @@ export default class EnVenta extends Component {
                     </CCol>
                 </CTabPane>
                 <CTabPane>
-                <CCol xs="12" md="11" className="m-3">
+                <CCol xs="12" md="12" className="m-3">
                     <CRow>
-                        <CCol md="2">
+                        <CCol md="1">
                             <span>Departamento</span>
                         </CCol>
                         <CCol md="3">
@@ -94,15 +107,29 @@ export default class EnVenta extends Component {
                             <option value="10">Junin</option>
                             <option value="11">Lambayeque</option>
                             <option value="12">Amazonas</option>
+                            <option value="13">Todos</option>
                             </CSelect>
                         </CCol>
-                        <CCol md="2">
+                        <CCol md="1">
                             <span>Tipo de entrega</span>
                         </CCol>
-                        <CCol md="3">
+                        <CCol md="2">
                             <CSelect>
                             <option value="1">A domicilio</option>
                             <option value="2">Recojo en Agente</option>
+                            <option value="3s">Todos</option>
+                            </CSelect>
+                        </CCol>
+                        <CCol md="1">
+                            <span>Estado</span>
+                        </CCol>
+                        <CCol md="2">
+                            <CSelect>
+                            <option value="1">Cotizar envío</option>
+                            <option value="2">Confirmar pago</option>
+                            <option value="3">Por enviar</option>
+                            <option value="4">Pendiente pago</option>
+                            <option value="5">Todos</option>
                             </CSelect>
                         </CCol>
                         <CButton md="2" color='primary'>
@@ -114,31 +141,36 @@ export default class EnVenta extends Component {
                     <CCard className="mb-0">
                         <CCardHeader>
                             <CRow>
-                                
                                 <CCol md="10">
                                     <CButton 
-                                        block 
-                                        color="link" 
+                                        block
                                         className="text-left m-0 p-0" 
                                         onClick={() => this.setState({collapse: this.state.collapse === 0 ? null : 0})}
                                     >
-                                        <h5>Cliente</h5>
+                                        <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
+                                            <span>Cliente: Juan Robles </span>    
+                                            <span> Dirección: Av. Nogales 374 - San Borja - Lima</span>  
+                                            <span> Entrega: a domicilio</span>     
+                                        </CRow>
                                     </CButton>
                                 </CCol>
                                 <CCol md="2">
-                                    <CButton color='primary'>
-                                        Enviado
+                                    <CButton color='danger' size='sm'>
+                                        Confirmar pago
                                     </CButton>
                                 </CCol>
                             </CRow>
                         </CCardHeader>
                         <CCollapse show={this.state.collapse === 0}>
                             <CCardBody>
-                                1. Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non
-                                cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird
-                                on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred
-                                nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft
-                                beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven''t heard of them accusamus labore sustainable VHS.
+                                <CRow className="g-0">
+                                    <CCol className="m-0">
+                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    </CCol>
+                                    <CCol className="m-0">
+                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    </CCol>
+                                </CRow>
                             </CCardBody>
                         </CCollapse>
                     </CCard>
@@ -147,21 +179,20 @@ export default class EnVenta extends Component {
                             <CRow>
                                 <CCol md="10">
                                     <CButton 
-                                        block 
-                                        color="link" 
+                                        block
                                         className="text-left m-0 p-0" 
                                         onClick={() => this.setState({collapse: this.state.collapse === 1 ? null : 1})}
                                     >
                                         <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
-                                            <span>Ocasi.on </span>    
-                                            <span> 2 prendas</span>   
-                                            <span>Pedir envío antes de: 01/02/22</span>
+                                        <span>Cliente: Juan Robles </span>    
+                                            <span> Dirección: Av. Nogales 374 - San Borja - Lima</span>  
+                                            <span> Entrega: a domicilio</span>  
                                         </CRow>
                                     </CButton>
                                 </CCol>
                                 <CCol md="2">
                                     <Link className="link" to={{pathname: "/login", state: {prenda: prendaData[0]}}}>
-                                        <CButton color='primary'>
+                                        <CButton color='primary' size='sm'>
                                             Enviado
                                         </CButton>
                                     </Link>
@@ -172,10 +203,46 @@ export default class EnVenta extends Component {
                             <CCardBody>
                                 <CRow className="g-0">
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
                                     </CCol>
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    </CCol>
+                                </CRow>
+                            </CCardBody>
+                        </CCollapse>
+                    </CCard>
+                    <CCard className="mb-0">
+                        <CCardHeader>
+                            <CRow>
+                                <CCol md="10">
+                                    <CButton 
+                                        block
+                                        className="text-left m-0 p-0" 
+                                        onClick={() => this.setState({collapse: this.state.collapse === 2 ? null : 2})}
+                                    >
+                                        <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
+                                            <span>Cliente: Juan Robles </span>    
+                                            <span> Dirección: Av. Nogales 374 - San Borja - Lima</span>  
+                                            <span> Entrega: a domicilio</span>     
+                                        </CRow>
+                                    </CButton>
+                                </CCol>
+                                <CCol md="2">
+                                    <CButton color='warning' size='sm' onClick={this.onClickCE}>
+                                        Cotizar envío
+                                    </CButton>
+                                </CCol>
+                            </CRow>
+                        </CCardHeader>
+                        <CCollapse show={this.state.collapse === 2}>
+                            <CCardBody>
+                                <CRow className="g-0">
+                                    <CCol className="m-0">
+                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    </CCol>
+                                    <CCol className="m-0">
+                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
                                     </CCol>
                                 </CRow>
                             </CCardBody>
@@ -211,6 +278,40 @@ export default class EnVenta extends Component {
                 </CTabPane>
             </CTabContent>
         </CTabs>
+        <CModal 
+            show={this.state.validarPago} 
+            onClose={() => this.setState({validarPago: !this.state.validarPago})}
+            size="lg"
+        >
+            <CModalHeader closeButton>
+            <CModalTitle>Validar Pago</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                <CCardImg src='https://mitokenonline.com/wp-content/uploads/2023/06/comprobante-yape.png'></CCardImg>
+            </CModalBody>
+            <CModalFooter>
+            <CButton color="primary" onClick={() => this.setState({validarPago: !this.state.validarPago})}>Confirmar Pago</CButton>{' '}
+            <CButton color="secondary" onClick={() => this.setState({validarPago: !this.state.validarPago})}>Reportar</CButton>
+            </CModalFooter>
+        </CModal>
+        <CModal 
+            show={this.state.cotizarEnvio}
+            onClose={() => this.setState({cotizarEnvio: !this.state.cotizarEnvio})}
+            size="sm"
+        >
+            <CModalHeader closeButton>
+            <CModalTitle>Cotizar envío</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                <CFormGroup>
+                    <CLabel type='number'>Indicar e precio del delivery</CLabel>
+                    <CInput id="precio" placeholder="S/." required />
+                </CFormGroup>
+            </CModalBody>
+            <CModalFooter>
+            <CButton color="primary" onClick={() => this.setState({cotizarEnvio: !this.state.cotizarEnvio})}>Enviar</CButton>
+            </CModalFooter>
+        </CModal>
         </>
     )
   }

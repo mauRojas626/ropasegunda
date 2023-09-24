@@ -46,6 +46,7 @@ const Entrega = React.lazy(() => import('./views/pages/principal/SolicitudEnvio'
 const Perfil = React.lazy(() => import('./views/pages/principal/InformacionUsuario'));
 const EnVenta = React.lazy(() => import('./views/pages/principal/EnVenta'));
 const Nuevo = React.lazy(() => import('./views/pages/principal/NuevaPrenda'));
+const Admin = React.lazy(() => import('./views/pages/principal/Administrador'));
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -89,14 +90,15 @@ const routes = [
   { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/principal', exact: true, name: 'Principal', component: Prendas },
-  { path: '/principal/Prenda', exact: true, name: 'Detalle', component: Prenda },
-  { path: '/principal/Prendas', exact: true, name: 'Prendas', component: Prendas },
-  { path: '/principal/Pago', exact: true, name: 'Pago', component: Pago },
-  { path: '/principal/Comprados', exact: true, name: 'Comprados', component: Comprados },
-  { path: '/principal/Entrega', exact: true, name: 'Entrega', component: Entrega },
+  { path: '/prenda', exact: true, name: 'Detalle', component: Prenda },
+  { path: '/prendas', exact: true, name: 'Prendas', component: Prendas },
+  { path: '/pago', exact: true, name: 'Pago', component: Pago },
+  { path: '/comprados', exact: true, name: 'Comprados', component: Comprados },
+  { path: '/entrega', exact: true, name: 'Entrega', component: Entrega },
   { path: '/perfil', exact: true, name: 'Perfil', component: Perfil },
   { path: '/en-venta', exact: true, name: 'En Venta', component: EnVenta },
-  { path: '/nuevo', exact: true, name: 'Nuevo', component: Nuevo }
+  { path: '/nuevo', exact: true, name: 'Nuevo', component: Nuevo },
+  { path: '/admin', exact: true, name: 'Admin', component: Admin }
 ];
 
 export default routes;

@@ -23,7 +23,7 @@ export default class Pago extends Component {
                 <CRow>
                     <CCol xs="12" sm="12" className="m-auto">
                         <CCard>
-                            <PrendasCardHorizontal prenda={this.props.location.state.prenda}></PrendasCardHorizontal>
+                            <PrendasCardHorizontal prenda={this.props.location.state.prenda} modo="enviar"></PrendasCardHorizontal>
                         </CCard>
                     </CCol>
                 </CRow>

@@ -1,5 +1,6 @@
-import { CRow, CCol, CInput, CFormGroup, CLabel, CInputGroup, CInputGroupPrepend, CInputGroupText, CSelect, CInputFile } from '@coreui/react'
+import { CRow, CCol, CInput, CFormGroup, CLabel, CInputGroup, CInputGroupPrepend, CInputGroupText, CSelect, CButton } from '@coreui/react'
 import React, { Component } from 'react'
+import FileUpload from 'src/views/dropzone/FileUpload';
 
 export default class NuevaPrenda extends Component {
     onChange = (e) => {
@@ -12,7 +13,7 @@ export default class NuevaPrenda extends Component {
             <CRow>
                 <CCol md="6">
                     <CFormGroup className="mt-3">
-                        <CLabel type='text'>nombre</CLabel>
+                        <CLabel type='text'>Nombre</CLabel>
                         <CInput id="name" placeholder="Ingrese el nombre de la prenda" required />
                     </CFormGroup>
                     <CFormGroup>
@@ -108,22 +109,16 @@ export default class NuevaPrenda extends Component {
             <CRow>
                 <CCol>
                     <span>fotos</span>
-                    <CFormGroup row>
-                        <CCol xs="12" md="9">
-                            <CInputFile 
-                            id="fotos" 
-                            name="fotos" 
-                            accept='image/*'
-                            multiple
-                            custom
-                            onChange={this.onChange}
-                            />
-                            <CLabel  htmlFor="fotos" variant="custom-file">
-                            Selecciona las fotos
-                            </CLabel>
-                        </CCol>
-                    </CFormGroup>
+                    <CCol xs="12" sm="12" className="m-auto">
+                        <FileUpload modo="fotos"></FileUpload>
+                    </CCol>
                 </CCol>
+            </CRow>
+            <CRow className="mb-4">
+                <CCol md="4" className="m-auto">
+                    <CButton color='primary' block>Publicar</CButton>
+                </CCol>
+                
             </CRow>
         </CCol>
     )

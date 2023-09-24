@@ -2,6 +2,7 @@ import { CCol, CRow } from '@coreui/react';
 import React, { Component } from 'react'
 import PrendaCard from './PrendaCard';
 
+
 export default class Prendas extends Component {
 
 
@@ -15,7 +16,11 @@ export default class Prendas extends Component {
         return (
             <CCol xs="12" sm="12" className="m-auto">
                 <CRow xs="6" md="12">
-                    { prendaData.map(prenda => <PrendaCard onClick={this.onClick} key={prenda.id} prenda={prenda}></PrendaCard>) }
+                    { prendaData.map(prenda => 
+                        <CCol xs="12" sm="6" md="4" className="mb-3">
+                            <PrendaCard onClick={this.onClick} key={prenda.id} prenda={prenda}></PrendaCard>
+                        </CCol>
+                    ) }
                 </CRow>
             </CCol>
         )

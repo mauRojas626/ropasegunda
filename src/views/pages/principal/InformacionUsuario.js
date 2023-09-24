@@ -1,4 +1,4 @@
-import { CRow, CCol, CFormGroup, CLabel, CInput, CSelect, CInputFile, CButton, CInputGroup, CInputGroupPrepend, CInputGroupText } from '@coreui/react'
+import { CRow, CCol, CFormGroup, CLabel, CInput, CSelect, CInputFile, CButton, CInputGroup, CInputGroupPrepend } from '@coreui/react'
 import React, { Component } from 'react'
 
 export default class InformacionUsuario extends Component {

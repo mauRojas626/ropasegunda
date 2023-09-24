@@ -27,13 +27,13 @@ export default class SolicitudEnvio extends Component {
                             <h5>Último día para pedir envío: 09/12/23</h5>
                         </CCol>
                     </CCard>
-                    <h4>Elija su medio de pago</h4>
+                    <h4>Elija su tipo de envío</h4>
                     <CRow>
                         <CCol>
-                            <CButton size='lg' onClick={this.onClick} block color='primary' disabled={!this.state.agencia}>A domicilio</CButton>
+                            <CButton size='lg' onClick={this.onClick} block color={this.state.agencia ? "dark": "primary"} disabled={!this.state.agencia}>A domicilio</CButton>
                         </CCol>
                         <CCol>
-                            <CButton size='lg' onClick={this.onClick} block color='primary' disabled={this.state.agencia}>Recojo en agencia</CButton>
+                            <CButton size='lg' onClick={this.onClick} block color={!this.state.agencia ? "dark": "primary"} disabled={this.state.agencia}>Recojo en agencia</CButton>
                         </CCol>
                     </CRow>  
                 </CCol>
