@@ -17,6 +17,7 @@ export default class Prenda extends Component {
     }
 
     render() {
+        const prenda2 = {id: 2, nombre: "Polera H&M", precio: 10, talla: "XS", color: "Azul", detalles: "No", marca: "H&M", sexo: 1, categoría: "polo", material: "algodón", fotos: [{link: "https://hmperu.vtexassets.com/arquivos/ids/3685306/Casaca-polar-con-capucha---Negro---H-M-PE.jpg?v=1778013864"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Ocasi.on"}
         const fields = ['Tipo', 'Medida']
         const medidaData = [{ Tipo: 'Cadera', Medida: 80 }, { Tipo: 'Cintura', Medida: 75 }, { Tipo: 'Busto', Medida: 79 }, { Tipo: 'Largo Prenda', Medida: 65 }, { Tipo: 'Largo Manga', Medida: 60 }]
         return (
@@ -137,7 +138,7 @@ export default class Prenda extends Component {
                     </CCard>
                 </CCol>
                 <CCol  xs="12" sm="4" className="m-top">
-                    <PrendaCard prenda={this.props.location.state.prenda} ></PrendaCard>
+                    <PrendaCard prenda={prenda2} ></PrendaCard>
                 </CCol>
             </CRow>
             </>

@@ -3,19 +3,19 @@ const _nav =  [
     _tag: 'CSidebarNavItem',
     name: 'Mis prendas en venta',
     to: '/en-venta',
-    icon: 'cil-user'
+    icon: 'cil-tags'
   },
   {
     _tag: 'CSidebarNavItem',
     name: 'Ropa comprada',
     to: '/comprados',
-    icon: 'cil-user'
+    icon: 'cil-basket'
   },
   {
     _tag: 'CSidebarNavItem',
     name: 'Comprar',
     to: '/prendas',
-    icon: 'cil-user'
+    icon: 'cil-magnifying-glass'
   },
   {
     _tag: 'CSidebarNavItem',
@@ -27,7 +27,7 @@ const _nav =  [
     _tag: 'CSidebarNavItem',
     name: 'Administrar usuarios',
     to: '/admin',
-    icon: 'cil-user',
+    icon: 'cil-people',
   }]
   {/*,
   {

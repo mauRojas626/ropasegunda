@@ -1,4 +1,4 @@
-import { CButton, CTabPane, CCol, CRow, CNavItem, CNavLink, CTabContent, CTabs, CNav, CCard, CSelect, CCardHeader, CCollapse, CCardBody, CModalBody, CModalFooter, CModalHeader, CModalTitle, CModal, CCardImg, CFormGroup, CLabel, CInput } from '@coreui/react'
+import { CButton, CTabPane, CInputFile, CCol, CRow, CNavItem, CNavLink, CTabContent, CTabs, CNav, CCard, CSelect, CCardHeader, CCollapse, CCardBody, CModalBody, CModalFooter, CModalHeader, CModalTitle, CModal, CCardImg, CFormGroup, CLabel, CInput } from '@coreui/react'
 import React, { Component } from 'react'
 import PrendasCardHorizontal from './PrendaCardHorizontal';
 import { Link } from 'react-router-dom';
@@ -165,10 +165,10 @@ export default class EnVenta extends Component {
                             <CCardBody>
                                 <CRow className="g-0">
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enventa" prenda={prendaData[0]}></PrendasCardHorizontal>
                                     </CCol>
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enventa" prenda={prendaData[1]}></PrendasCardHorizontal>
                                     </CCol>
                                 </CRow>
                             </CCardBody>
@@ -203,10 +203,10 @@ export default class EnVenta extends Component {
                             <CCardBody>
                                 <CRow className="g-0">
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enventa" prenda={prendaData[0]}></PrendasCardHorizontal>
                                     </CCol>
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enventa" prenda={prendaData[0]}></PrendasCardHorizontal>
                                     </CCol>
                                 </CRow>
                             </CCardBody>
@@ -222,8 +222,8 @@ export default class EnVenta extends Component {
                                         onClick={() => this.setState({collapse: this.state.collapse === 2 ? null : 2})}
                                     >
                                         <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
-                                            <span>Cliente: Juan Robles </span>    
-                                            <span> Dirección: Av. Nogales 374 - San Borja - Lima</span>  
+                                            <span>Cliente: Saul Perez </span>    
+                                            <span> Dirección: Ca. Flores 654 - Jesús María - Lima</span>  
                                             <span> Entrega: a domicilio</span>     
                                         </CRow>
                                     </CButton>
@@ -239,10 +239,10 @@ export default class EnVenta extends Component {
                             <CCardBody>
                                 <CRow className="g-0">
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enventa" prenda={prendaData[3]}></PrendasCardHorizontal>
                                     </CCol>
                                     <CCol className="m-0">
-                                    <PrendasCardHorizontal modo="enviar" prenda={prendaData[0]}></PrendasCardHorizontal>
+                                    <PrendasCardHorizontal modo="enventa" prenda={prendaData[2]}></PrendasCardHorizontal>
                                     </CCol>
                                 </CRow>
                             </CCardBody>
@@ -288,6 +288,15 @@ export default class EnVenta extends Component {
             </CModalHeader>
             <CModalBody>
                 <CCardImg src='https://mitokenonline.com/wp-content/uploads/2023/06/comprobante-yape.png'></CCardImg>
+                <CFormGroup row className="m-4">
+                  <CLabel col md={3}>Subir comprobante</CLabel>
+                  <CCol xs="12" md="9">
+                    <CInputFile custom id="custom-file-input"/>
+                    <CLabel htmlFor="custom-file-input" variant="custom-file">
+                      Elige el archivo...
+                    </CLabel>
+                  </CCol>
+                </CFormGroup>
             </CModalBody>
             <CModalFooter>
             <CButton color="primary" onClick={() => this.setState({validarPago: !this.state.validarPago})}>Confirmar Pago</CButton>{' '}

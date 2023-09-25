@@ -22,7 +22,7 @@ export default class PrendasCardHorizontal extends Component {
                     <CButton color="primary" size='sm' className="float-right mr-2" onClick={this.props.onClick}>Validar pago</CButton>
                     : <></>}
                     
-                    <h5>{this.props.tipo === "validar" ? "Estado: " : this.props.modo === "enventa" ? "" : this.props.prenda.vendedor}</h5>
+                    <h5>{this.props.tipo === "validar" ? "Estado: " : this.props.modo === "enventa" || this.props.modo === "enviar"  ? "" : this.props.prenda.vendedor}</h5>
                         
                     <h4>{this.props.prenda.nombre}</h4>
                     <br/>
