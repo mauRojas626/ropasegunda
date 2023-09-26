@@ -87,7 +87,7 @@ export default class Comprados extends Component {
                                                         onClick={() => this.setState({collapse: this.state.collapse === 1 ? null : 1})}
                                                     >
                                                         <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
-                                                            <span>Ocasi.on </span>    
+                                                            <span>Natalia Perez </span>    
                                                             <span> 2 prendas</span>   
                                                             <span>Fecha máxima de confimación: 27/09/23</span>
                                                         </CRow>
@@ -153,7 +153,7 @@ export default class Comprados extends Component {
                                                         onClick={() => this.setState({collapse: this.state.collapse === 1 ? null : 1})}
                                                     >
                                                         <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
-                                                            <span>Ocasi.on </span>    
+                                                            <span>Braulio Muñoz </span>    
                                                             <span> 2 prendas</span>   
                                                             <span>Precio envío: S/10</span>
                                                         </CRow>
