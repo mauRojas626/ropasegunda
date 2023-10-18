@@ -7,7 +7,7 @@ import {
 import { CContainer, CFade } from '@coreui/react'
 
 // routes config
-import routes from '../routes'
+import routes from '../routes/routes'
   
 const loading = (
   <div className="pt-3 text-center">
@@ -35,7 +35,7 @@ const TheContent = () => {
                   )} />
               )
             })}
-            <Redirect from="/" to="/dashboard" />
+            <Redirect from="/" to="/prendas" />
           </Switch>
         </Suspense>
       </CContainer>

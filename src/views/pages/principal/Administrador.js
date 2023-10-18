@@ -1,26 +1,38 @@
 import React, { Component } from 'react'
 import { CButton, CCol, CCard, CRow, CCollapse, CCardBody, CCardHeader, CProgress } from '@coreui/react';
 import CIcon from '@coreui/icons-react';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as buyerActions from '../../../services/redux/actions/comprador'
 
-export default class Administrador extends Component {
+class Administrador extends Component {
   constructor(props){
     super(props);
     this.state = {
         collapse: 0,
+        isLoading: true,
+        failed: false,
+        usuarios: []
     }
-}
+  }
+  async componentDidMount(){
+    await this.props.getBuyers();
+    this.setState({usuarios: this.props.buyer})
+
+  }
+
   render() {
     return (
       <CCol xs="12" md="11" className="m-3">
         <h3>Validar RUC</h3>
-        <CCard className="mb-0">
+        {this.state.usuarios.map((usuario,index) => <CCard className="mb-4" key={index}>
             <CCardHeader>
                 <CRow>
                     <CCol md="10">
                       <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
-                          <span>Nombre: Sergio Calle</span>    
-                          <span>DNI: 10430948</span> 
-                          <span>RUC: 1029897849</span>
+                          <span>Nombre: {usuario.nombre}</span>    
+                          <span>DNI: {usuario.dni}</span> 
+                          <span>RUC: {1000000000 + usuario.dni + index+13}</span>
                       </CRow>
                     </CCol>
                     <CCol md="2">
@@ -33,7 +45,7 @@ export default class Administrador extends Component {
                     </CCol>
                 </CRow>
             </CCardHeader>
-          </CCard>
+          </CCard>)}
         <h3>Usuarios</h3>
         <CCard className="mb-0">
             <CCardHeader>
@@ -48,7 +60,7 @@ export default class Administrador extends Component {
                                 <span>Nombre: Sergio Calle</span>    
                                 <span>DNI: 10430948</span> 
                                 <span>RUC: 1029897849</span>  
-                                <span>Reportado: 5 veces</span>
+                                <span>Reportado: 6 veces</span>
                             </CRow>
                         </CButton>
                     </CCol>
@@ -95,3 +107,17 @@ export default class Administrador extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+      buyer: state.comprador.buyers
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+      ...bindActionCreators(Object.assign({},buyerActions), dispatch)
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Administrador)

@@ -1,0 +1,4 @@
+export const GET_CLOTHES = 'GET_CLOTHES'
+export const CREATE_CLOTHES = 'CREATE_CLOTHES'
+export const UPDATE_CLOTHES = 'UPDATE_CLOTHES'
+export const ERROR_CLOTHES = 'ERROR_CLOTHES'

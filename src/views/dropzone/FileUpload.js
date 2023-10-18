@@ -2,19 +2,18 @@ import { CImg } from '@coreui/react';
 import { CCol, CRow, CBadge } from '@coreui/react';
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-const FileUpload = (modo) => {
+const FileUpload = ({modo, newPhoto, removePhoto}) => {
     const [files, setFiles] = useState([])
-    const m = modo.modo
+    const m = modo
     const onDrop = useCallback(acceptedFiles => {
-      console.log(m)
       if(acceptedFiles?.length && m === 'fotos'){
-        console.log(acceptedFiles)
         setFiles(previousFiles => [
           ...previousFiles,
           ...acceptedFiles.map(file =>
             Object.assign(file, {preview: URL.createObjectURL(file)})
           )
         ])
+        newPhoto(acceptedFiles)
       }
       else if(acceptedFiles.length = 1) {
             setFiles(acceptedFiles.map(file =>
@@ -27,8 +26,9 @@ const FileUpload = (modo) => {
 
     const removeFile = (name) => {
       setFiles(files => files.filter(files => files.name !== name))
+      removePhoto(name)
     }
-//TO DO : Customize and Style this Drag and Drop to Upload box as you want🧑 💻😊
+//TO DO : Customize and Style this Drag and Drop to Upload box as you want🧑💻😊
   return (
     <CCol>
       <div {...getRootProps()}  className='dropzone mb-3'>
@@ -39,10 +39,10 @@ const FileUpload = (modo) => {
           )): <></>}
       </div>
       {m === 'fotos' ?<CRow>
-        {files.map((file) => (
-                <CCol md="3">
+        {files.map((file, index) => (
+                <CCol md="3" key={index}>
                   <CBadge onClick={() => removeFile(file.name)} shape="pill" color="danger" className="float-right mr-2">X</CBadge>
-                  <CImg src={file.preview} style={{maxHeight: "15rem"}} onLoad={() => {URL.revokeObjectURL(file.preview)}}></CImg>
+                  <CImg src={file.preview} style={{maxHeight: "15rem"}}></CImg>
                   
                 </CCol>
             ))

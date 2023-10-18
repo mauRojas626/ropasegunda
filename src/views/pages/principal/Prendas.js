@@ -2,23 +2,57 @@ import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton, CInput, CCollapse, 
 import React, { Component } from 'react'
 import PrendaCard from './PrendaCard';
 import CIcon from '@coreui/icons-react';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as clothesActions from '../../../services/redux/actions/prenda'
 
-
-export default class Prendas extends Component {
+class Prendas extends Component {
     constructor(props){
         super(props);
         this.state = {
-            collapse: 0
+            collapse: 0,
+            clothes: [],
+            url: '',
+            categorias: [],
+            tallas: [],
+            clothesFilter: []
         }
     }
 
+    async componentDidMount(){
+        await this.props.getClothes();
+        const categorias = Array.from(
+            new Set(this.props.clothes.map(item => item.categoria))
+        );
+        const tallas = Array.from(
+            new Set(this.props.clothes.map(item => item.talla))
+        );
+        this.setState({ clothes: this.props.clothes, categorias: categorias, tallas: tallas, clothesFilter: this.props.clothes})
+    }
+
+    onChangeCat = (e) => {
+        const {categorias, clothes} = this.state
+        let cat
+        
+        if(categorias.includes(e)){
+            this.setState({
+                categorias: categorias.filter(item => item !== e)
+            })  
+            cat = categorias.filter(item => item !== e)
+        }
+        else{
+            this.setState({
+                categorias:[ ...categorias, e]
+            })
+            cat = [ ...categorias, e]
+        }
+        
+        this.setState({clothesFilter: clothes.filter(item =>
+            cat.length === 0 || cat.includes(item.categoria)
+          )})
+    }
+
     render() {
-            const prendaData = [
-                {id: 0, nombre: "Saco Zara", precio: 45, talla: "S", color: "Rojo", detalles: "Tiene un descosido en la parte de atrás", marca: "Zara", sexo: 0, categoría: "saco", material: "tela", fotos: [{link: "https://http2.mlstatic.com/D_NQ_NP_720832-MPE48261251804_112021-O.webp"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Ocasi.on"},
-                {id: 1, nombre: "Polo H&M", precio: 10, talla: "XS", color: "Rojo", detalles: "No", marca: "H&M", sexo: 1, categoría: "polo", material: "algodón", fotos: [{link: "https://nautica.com.pe/cdn/shop/products/K71006_6NR_A_89ff13d1-839b-4423-8309-53bbb632f804.jpg?v=1652803427"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Natalia Salas"},
-                {id: 2, nombre: "Chompa Marrón", precio: 15, talla: "XS", color: "Marrón", detalles: "No", marca: "", sexo: 1, categoría: "chompa", material: "", fotos: [{link: "https://lastraperas-public.imgix.net/items/64d2ce621550170008316d2f/IMG_6734_clipped_rev_1.png?h=345&auto=format"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Maria Marroquín"},
-                {id: 3, nombre: "Top Zara", precio: 15, talla: "S", color: "", detalles: "No", marca: "", sexo: 0, categoría: "Top", material: "", fotos: [{link: "https://lastraperas-public.imgix.net/items/64b8762b22ce520008503ff8/WhatsApp-Image-2023-08-25-at-1.19.34-PM_clipped_rev_1.png?h=345&auto=format"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Ocasi.on"},
-            ]
         return (
             <CRow>
                 <CCol sm="3">
@@ -43,22 +77,12 @@ export default class Prendas extends Component {
                                         <CRow className="g-0">
                                             <CCol className="m-0">
                                                 <CInput size='sm'></CInput>
-                                                <CFormGroup variant="checkbox" className="checkbox">
-                                                    <CInputCheckbox 
-                                                        id="checkbox1" 
-                                                        name="checkbox1" 
-                                                        value="option1" 
-                                                    />
-                                                    <CLabel variant="checkbox" className="form-check-label" htmlFor="checkbox1">Polo</CLabel>
+                                                {this.state.clothes.map((item, index) =>
+                                                    <CFormGroup variant="checkbox" className="checkbox" key={index}>
+                                                        <CInputCheckbox id={index} name={index} value={item.categoria} checked={this.state.categorias.includes(item.categoria)} onChange={()=>this.onChangeCat(item.categoria)} />
+                                                        <CLabel variant="checkbox" className="form-check-label" htmlFor={index}>{item.categoria}</CLabel>
                                                     </CFormGroup>
-                                                    <CFormGroup variant="checkbox" className="checkbox">
-                                                    <CInputCheckbox id="checkbox2" name="checkbox2" value="option2" />
-                                                    <CLabel variant="checkbox" className="form-check-label" htmlFor="checkbox2">Casaca</CLabel>
-                                                    </CFormGroup>
-                                                    <CFormGroup variant="checkbox" className="checkbox">
-                                                    <CInputCheckbox id="checkbox3" name="checkbox3" value="option3" />
-                                                    <CLabel variant="checkbox" className="form-check-label" htmlFor="checkbox3">Vestido</CLabel>
-                                                </CFormGroup>
+                                                )}
                                             </CCol>
                                         </CRow>
                                     </CCardBody>
@@ -96,7 +120,7 @@ export default class Prendas extends Component {
                                         onClick={() => this.setState({collapse: this.state.collapse === 2 ? null : 2})}
                                     >
                                     <CIcon name='cil-chevron-bottom' className="float-right"></CIcon>
-                                    Nota vendedor
+                                    Calificación vendedor
                                     </CButton>
                                 </CCardHeader>
                                 <CCollapse show={this.state.collapse === 2}>
@@ -180,6 +204,33 @@ export default class Prendas extends Component {
                                     <CButton 
                                         block
                                         className="text-left m-0 p-0" 
+                                        onClick={() => this.setState({collapse: this.state.collapse === 6 ? null : 6})}
+                                    >
+                                    <CIcon name='cil-chevron-bottom' className="float-right"></CIcon>
+                                    Talla
+                                    </CButton>
+                                </CCardHeader>
+                                <CCollapse show={this.state.collapse === 6}>
+                                    <CCardBody>
+                                        <CRow className="g-0 inline ">
+                                            <CCol>
+                                                {this.state.tallas.map((talla, index) =>
+                                                    <CFormGroup variant="checkbox" className="checkbox" key={index}>
+                                                        <CInputCheckbox id={index} name={index} value={talla} />
+                                                        <CLabel variant="checkbox" className="form-check-label" htmlFor={index}>{talla}</CLabel>
+                                                    </CFormGroup>
+                                                )}
+                                                
+                                            </CCol>
+                                        </CRow>
+                                    </CCardBody>
+                                </CCollapse>
+                            </CCard>
+                            <CCard className="mb-0">
+                                <CCardHeader>
+                                    <CButton 
+                                        block
+                                        className="text-left m-0 p-0" 
                                         onClick={() => this.setState({collapse: this.state.collapse === 4 ? null : 4})}
                                     >
                                     <CIcon name='cil-chevron-bottom' className="float-right"></CIcon>
@@ -244,8 +295,8 @@ export default class Prendas extends Component {
                 </CCol>
                 <CCol xs="12" sm="9" className="m-auto">
                     <CRow xs="6" md="12">
-                        { prendaData.map(prenda => 
-                            <CCol xs="12" sm="6" md="4" className="mb-3">
+                        { this.state.clothesFilter.map((prenda,index) => 
+                            <CCol key={index} xs="12" sm="6" md="4" className="mb-3">
                                 <PrendaCard onClick={this.onClick} key={prenda.id} prenda={prenda}></PrendaCard>
                             </CCol>
                         ) }
@@ -256,3 +307,17 @@ export default class Prendas extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        clothes: state.prenda.clothes
+    }
+  }
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+        ...bindActionCreators(Object.assign({},clothesActions), dispatch)
+    }
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Prendas)

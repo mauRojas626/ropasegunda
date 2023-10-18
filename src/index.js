@@ -9,15 +9,10 @@ import * as serviceWorker from './serviceWorker';
 
 import { icons } from './assets/icons'
 
-import { Provider } from 'react-redux'
-import store from './store'
-
 React.icons = icons
 
 ReactDOM.render(
-  <Provider store={store}>
-    <App/>
-  </Provider>,
+    <App/>,
   document.getElementById('root')
 );
 

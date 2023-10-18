@@ -1,7 +1,27 @@
 import { CRow, CCol, CFormGroup, CLabel, CInput, CSelect, CInputFile, CButton, CInputGroup, CInputGroupPrepend } from '@coreui/react'
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as buyerActions from '../../../services/redux/actions/comprador'
 
-export default class InformacionUsuario extends Component {
+class InformacionUsuario extends Component {
+  constructor(props){
+    super(props);
+    this.state = {
+        collapse: 0,
+        isLoading: true,
+        failed: false,
+        usuarios: []
+    }
+  }
+  
+  
+  async componentDidMount(){
+    await this.props.getBuyers();
+    this.setState({usuarios: this.props.buyer})
+
+  }
+
   render() {
     return (
       <>
@@ -139,3 +159,17 @@ export default class InformacionUsuario extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+  return {
+      buyer: state.comprador.buyers
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+      ...bindActionCreators(Object.assign({},buyerActions), dispatch)
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(InformacionUsuario)

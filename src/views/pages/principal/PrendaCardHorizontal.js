@@ -14,7 +14,7 @@ export default class PrendasCardHorizontal extends Component {
         return (
             <CRow className="g-0"> 
                 <CCol xs="12" sm={this.props.modo === "enventa" ? 6 : 4} className="m-left m-0" >
-                    <CCardImg src={this.props.prenda.fotos[0].link} style={{height: "12rem"}}></CCardImg>
+                    <CCardImg src={this.props.prenda.fotos[0].url} style={{height: "12rem"}}></CCardImg>
                 </CCol>
                 <CCol xs="12" sm={this.props.modo === "enventa" ? 6 : 4} className="m-auto" >
                     {this.props.edit ? <><CIcon name="cil-trash" className="float-right mr-3"/>

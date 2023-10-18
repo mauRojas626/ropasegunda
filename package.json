@@ -1,27 +1,10 @@
 {
-  "name": "primavera-reactiva-front",
+  "name": "tesis2",
   "version": "0.1.0",
-  "description": "Sistema Integrado De Automatizacion",
+  "description": "Sistema de compra y venta de ropa de segunda mano",
   "author": {
-    "name": "Primavera Reactiva"
+    "name": "Mauricio Rojas"
   },
-  "contributors": [
-    {
-      "name": "Diego"
-    },
-    {
-      "name": "Tania"
-    },
-    {
-      "name": "Jeferson"
-    },
-    {
-      "name": "Mauricio"
-    },
-    {
-      "name": "Diana"
-    }
-  ],
   "private": true,
   "dependencies": {
     "@coreui/chartjs": "^2.0.0",
@@ -32,6 +15,7 @@
     "@coreui/react-chartjs": "^1.1.0",
     "@coreui/utils": "^1.3.1",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.6.0",
+    "axios": "^1.5.1",
     "classnames": "^2.2.6",
     "core-js": "^3.9.1",
     "enzyme": "^3.11.0",
@@ -44,6 +28,9 @@
     "react-redux": "^7.2.3",
     "react-router-dom": "^5.2.0",
     "redux": "^4.0.5",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-persist": "^6.0.0",
+    "redux-thunk": "^2.4.2",
     "sass": "^1.32.8",
     "xlsx": "^0.17.0"
   },

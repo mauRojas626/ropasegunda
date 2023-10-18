@@ -1,6 +1,6 @@
 import SimpleProperty from './SimpleProperty'
 
-export default class PrendayModel extends SimpleProperty {
+export default class PrendaModel extends SimpleProperty {
     id = 0;
     nombre = '';
     precio = 0;
@@ -13,4 +13,9 @@ export default class PrendayModel extends SimpleProperty {
     material = '';
     fotos = [];
     fechaPublicacion = '';
+    idConsulta = null;
+    idMedida = null;
+    idVendedor = null;
+    Comprado = 0;
+    descripcion = '';
 }
