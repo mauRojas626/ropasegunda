@@ -1,0 +1,5 @@
+export const GET_SELL = 'GET_SELL'
+export const CREATE_SELL = 'CREATE_SELL'
+export const UPDATE_SELL = 'UPDATE_SELL'
+export const ERROR_SELL = 'ERROR_SELL'
+export const DELETE_SELL = 'DELETE_SELL'

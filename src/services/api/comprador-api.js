@@ -4,16 +4,20 @@ const getBuyers = async () => {
     return await apiGet(`buyers/list`);
 }
 
-const createBuyer = async (semester) => {
-    return await apiPost(`buyers/create`, semester);
+const createBuyer = async (buyer) => {
+    return await apiPost(`buyers/create`, buyer);
 }
 
-const updateBuyer = async (semester) => {
-    return await apiPost(`buyers/edit`, semester);
+const updateBuyer = async (buyer) => {
+    return await apiPost(`buyers/edit`, buyer);
 }
 
 const deleteBuyer = async (id) => {
     return await apiDelete(`buyers/delete/`+id);
 }
 
-export { getBuyers, createBuyer, updateBuyer, deleteBuyer } 
+const validateBuyer = async (buyer) => {
+    return await apiPost(`buyers/validate`, buyer);
+}
+
+export { getBuyers, createBuyer, updateBuyer, deleteBuyer, validateBuyer } 

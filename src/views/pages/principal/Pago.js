@@ -1,13 +1,18 @@
 import React, { Component } from 'react'
-import { CButton, CCol, CImg, CRow, CSwitch, CCard } from '@coreui/react';
+import { CButton, CCol, CImg, CRow, CSwitch, CCard, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react';
 import FileUpload from 'src/views/dropzone/FileUpload';
 import PrendasCardHorizontal from './PrendaCardHorizontal';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as sellActions from '../../../services/redux/actions/venta'
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
-export default class Pago extends Component {
+class Pago extends Component {
     constructor(props){
         super(props);
         this.state = {
-            showQrYape: true 
+            showQrYape: true,
+            photo: false
         }
     }
 
@@ -15,10 +20,24 @@ export default class Pago extends Component {
         this.setState({showQrYape: !this.state.showQrYape})
     }
 
+    onAddPhoto = (photo) => {
+        this.setState({photo: photo})
+    }
+
+    onSubmit = () => {
+        const formData = new FormData();
+        const newFileName = `${Date.now()}_${this.state.photo.name}`
+        formData.append('files', this.state.photo, newFileName)
+        const venta = { total: this.props.location.state.prenda.precio, idComprador: this.props.user.idUsuario, idVendedor: this.props.location.state.prenda.idVendedor.idUsuario, idPrenda: this.props.location.state.prenda.idPrenda}
+        formData.append('venta', JSON.stringify(venta));
+        this.props.createSell(formData)
+    }
+
     render() {
         const qr = this.state.showQrYape ? 'https://t3.gstatic.com/licensed-image?q=tbn:ANd9GcSh-wrQu254qFaRcoYktJ5QmUhmuUedlbeMaQeaozAVD4lh4ICsGdBNubZ8UlMvWjKC' : 'https://es.mailpro.com/blog/image.axd?picture=/QRCODES.png'
         const colorQr = this.state.showQrYape ? '#741993' : '#13CDD0'
         return (
+            <>
             <CCol xs="12" sm="12" className="m-auto">
                 <CRow>
                     <CCol xs="12" sm="12" className="m-auto">
@@ -69,16 +88,48 @@ export default class Pago extends Component {
                         </CRow>
                     </CCol>
                     <CCol xs="12" sm="4" className="m-auto">
-                        <FileUpload ></FileUpload>
+                        <FileUpload newPhoto={this.onAddPhoto}></FileUpload>
                     </CCol>
                     <CCol xs="12" sm="4" className="m-auto" >
                         
                         <span>Recuerda que subir documentos que no sean el comprobante de pago, generarán el bloqueo de su cuenta</span>
-                        <CButton className="mt-4" size="lg" block color='primary' >Confirmar Pago</CButton>
+                        <CButton className="mt-4" size="lg" block color='primary' onClick={this.onSubmit} disabled={!this.state.photo}>Confirmar Pago</CButton>
                     </CCol>
                 </CRow>
                 
             </CCol>
+            <CModal 
+                show={this.state.modal} 
+                onClose={() => this.setState({modal: !this.state.modal})}
+                size="sm"
+            >
+            <CModalHeader closeButton>
+            <CModalTitle>Compra Exitosa</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                Su compra fue realizada de manera exitosa. Puede ver el estado de su compra en la sección de ropa comprada
+            </CModalBody>
+            <CModalFooter>
+            <Link to="/comprados">
+                <CButton color="primary" onClick={() => this.setState({validarPago: !this.state.validarPago})}>Confirmar Pago</CButton>
+            </Link>
+            </CModalFooter>
+        </CModal>
+        </>
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        user: state.auth.user
+    }
+  }
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+        ...bindActionCreators(Object.assign({},sellActions), dispatch)
+    }
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Pago)

@@ -2,25 +2,26 @@ import { CImg } from '@coreui/react';
 import { CCol, CRow, CBadge } from '@coreui/react';
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-const FileUpload = ({modo, newPhoto, removePhoto}) => {
-    const [files, setFiles] = useState([])
+const FileUpload = ({modo, newPhoto, removePhoto, fotosOld}) => {
+    const [files, setFiles] = useState(fotosOld || [])
     const m = modo
     const onDrop = useCallback(acceptedFiles => {
       if(acceptedFiles?.length && m === 'fotos'){
         setFiles(previousFiles => [
           ...previousFiles,
           ...acceptedFiles.map(file =>
-            Object.assign(file, {preview: URL.createObjectURL(file)})
+            Object.assign(file, {url: URL.createObjectURL(file)})
           )
         ])
         newPhoto(acceptedFiles)
       }
       else if(acceptedFiles.length = 1) {
             setFiles(acceptedFiles.map(file =>
-              Object.assign(file, {preview: URL.createObjectURL(file)})
+              Object.assign(file, {url: URL.createObjectURL(file)})
             ));
+            newPhoto(acceptedFiles[0])
       }
-        
+      
     }, [])
     const { getRootProps, getInputProps, isDragActive } = useDropzone({onDrop, accept: {'image/*': []}})
 
@@ -35,14 +36,14 @@ const FileUpload = ({modo, newPhoto, removePhoto}) => {
         <input {...getInputProps()} />
         <p>{isDragActive ? ("Arrastra aqui"): m !== 'fotos' && files.length > 0 ? ("") : ("Arrastra tu archivo o haz click para abrir el explorador.")}</p>
           {m !== 'fotos' ? files.map((file) => (
-              <CImg src={file.preview} height="2rem"></CImg>
+              <CImg src={file.url} height="2rem"></CImg>
           )): <></>}
       </div>
       {m === 'fotos' ?<CRow>
         {files.map((file, index) => (
                 <CCol md="3" key={index}>
                   <CBadge onClick={() => removeFile(file.name)} shape="pill" color="danger" className="float-right mr-2">X</CBadge>
-                  <CImg src={file.preview} style={{maxHeight: "15rem"}}></CImg>
+                  <CImg src={file.url} style={{maxHeight: "15rem"}}></CImg>
                   
                 </CCol>
             ))

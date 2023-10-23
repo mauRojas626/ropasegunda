@@ -11,7 +11,9 @@ const createClothes = async (clothes) => {
 }
 
 const updateClothes = async (clothes) => {
-    return await apiPost(`clothes/edit`, clothes);
+    return await apiPost(`clothes/edit`, clothes, {
+        'Content-Type': 'multipart/form-data',
+    });
 }
 
 const deleteClothes = async (id) => {

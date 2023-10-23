@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CHeader,
@@ -11,10 +11,18 @@ import {
   CBreadcrumbRouter,
   CForm,
   CInput,
-  CButton
+  CButton,
+  CModal,
+  CModalHeader,
+  CModalTitle,
+  CModalBody,
+  CModalFooter,
+  CLabel,
+  CFormGroup, 
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { toggleSidebar as toggleSidebarAction } from '../services/redux/actions/changeState'
+import { login, logout } from '../services/redux/actions/auth';
 
 // routes config
 import routes from '../routes/routes'
@@ -27,6 +35,12 @@ import {
 const TheHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector(state => state.changeState.sidebarShow)
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
+  const user = useSelector(state => state.auth.user);
+  const [usuario, setUsuario] = React.useState('')
+  const [clave, setClave] = React.useState('')
+  const [error, setError] = React.useState(false)
+  const [confirmacion, setConfirmacion] = React.useState(false)
 
   const toggleSidebar = () => {
     const val = [true, 'responsive'].includes(sidebarShow) ? false : 'responsive'
@@ -37,8 +51,41 @@ const TheHeader = () => {
     const val = [false, 'responsive'].includes(sidebarShow) ? true : 'responsive'
     dispatch(toggleSidebarAction(val))
   }
+
+  const onChange = (key) => (e) => {
+    switch (key) {
+      case 'usuario':
+        setUsuario(e.target.value)
+        break;
+      case 'clave':
+        setClave(e.target.value)
+        break;
+      default:
+        break;
+    }
+  }
+  const onSubmit = () => {
+    let user1 = { correo: usuario, clave: clave }   
+    dispatch(login(user1));
+  }
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      setConfirmacion(false);
+    } else {
+      setError(true);
+    }
+  }, [isAuthenticated, user]);
+
+  const loginAuth = () => {
+    if(isAuthenticated){
+      dispatch(logout());
+    }
+    else setConfirmacion(true)
+  }
   
   return (
+    <>
     <CHeader withSubheader>
       <CToggler
         inHeader
@@ -78,7 +125,7 @@ const TheHeader = () => {
 
       <CHeaderNav className="px-3">
         <TheHeaderDropdownMssg/>
-        <TheHeaderDropdown/>
+        <TheHeaderDropdown loginAuth={loginAuth}/>
       </CHeaderNav>
 
       <CSubheader className="px-3 justify-content-between">
@@ -88,6 +135,34 @@ const TheHeader = () => {
         />
       </CSubheader>
     </CHeader>
+    <CModal 
+      show={confirmacion} 
+      onClose={() => setConfirmacion(!confirmacion)}
+      size="sm"
+  >
+      <CModalHeader closeButton>
+      <CModalTitle>Login</CModalTitle>
+      </CModalHeader>
+      <CModalBody>
+      <CForm>
+        <CFormGroup>
+            <CLabel type='text'>Usuario</CLabel>
+            <CInput id="user" placeholder="Ingrese su usuario" required onChange={onChange('usuario')} value={usuario}/>
+        </CFormGroup>
+        <CFormGroup>
+            <CLabel type='password'>Contraseña</CLabel>
+            <CInput id="password" placeholder="Ingrese su clave" required onChange={onChange('clave')} value={clave}/>
+        </CFormGroup>
+      </CForm>
+        {error && <p style={{color: 'red'}}>Usuario o contraseña incorrectos</p>}
+      </CModalBody>
+      <CModalFooter>
+      <CButton color="primary" onClick={() => onSubmit()}>
+          Aceptar
+      </CButton>
+      </CModalFooter>
+  </CModal>
+  </>
   )
 }
 

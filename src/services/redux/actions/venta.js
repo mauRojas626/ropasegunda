@@ -1,112 +1,112 @@
 import {
-    GET_CLOTHES,
-    CREATE_CLOTHES,
-    UPDATE_CLOTHES,
-    ERROR_CLOTHES,
-    DELETE_CLOTHES
-} from './actionTypes/prenda'
+    GET_SELL,
+    CREATE_SELL,
+    UPDATE_SELL,
+    ERROR_SELL,
+    DELETE_SELL
+} from './actionTypes/venta'
 import { 
-    createClothes as createClothesAPI,
-    getClothes as getClothesAPI,
-    updateClothes as updateClothesAPI,
-    deleteClothes as deleteClothesAPI
-} from '../../api/prenda-api'
+    createSell as createSellAPI,
+    getSell as getSellAPI,
+    updateSell as updateSellAPI,
+    deleteSell as deleteSellAPI
+} from '../../api/venta-api'
 
 import ResponseModel from '../../models/ResponseModel'
 
-const getClothes = () => async (dispatch) => {
+const getSell = (id) => async (dispatch) => {
     let res = new ResponseModel();
     try{
-        res = await getClothesAPI();
+        res = await getSellAPI(id);
         
         if(!res.error && res.status >= 200 && res.status <= 300){
 
             return dispatch({
-                type: GET_CLOTHES,
+                type: GET_SELL,
                 playload: res.response 
             })
         }
     } catch(e){
         console.log(e);
-        console.log('ERROR! '+GET_CLOTHES);
+        console.log('ERROR! '+GET_SELL);
         console.log(res.status);
         console.log(res.error);
     }
     return dispatch({
-        type: ERROR_CLOTHES,
+        type: ERROR_SELL,
         playload: false
     })
 }
 
-const createClothes = (clothes) => async (dispatch) => {
+const createSell = (sell) => async (dispatch) => {
     let res = new ResponseModel();
     try{
         
-        res = await createClothesAPI(clothes);
-        clothes.id = res.response;
+        res = await createSellAPI(sell);
+        sell.id = res.response;
 
         if(!res.error && res.status >= 200 && res.status <= 300){
             return dispatch({
-                type: CREATE_CLOTHES,
-                playload: clothes 
+                type: CREATE_SELL,
+                playload: sell 
             })
         }
     } catch(e){
         console.log(e);
-        console.log('ERROR! '+CREATE_CLOTHES);
+        console.log('ERROR! '+CREATE_SELL);
         console.log(res.status);
         console.log(res.error);
     }
     return dispatch({
-        type: ERROR_CLOTHES,
+        type: ERROR_SELL,
         playload: false
     })
 }
 
-const updateClothes = (clothes) => async (dispatch) => {
+const updateSell = (sell) => async (dispatch) => {
     let res = new ResponseModel();
     try{
-        res = await updateClothesAPI(clothes);
+        res = await updateSellAPI(sell);
         
         if(!res.error && res.status >= 200 && res.status <= 300){
             return dispatch({
-                type: UPDATE_CLOTHES,
-                playload: clothes
+                type: UPDATE_SELL,
+                playload: sell
             })
         }
     } catch(e){
         console.log(e);
-        console.log('ERROR! '+UPDATE_CLOTHES);
+        console.log('ERROR! '+UPDATE_SELL);
         console.log(res.status);
         console.log(res.error);
     }
     return dispatch({
-        type: ERROR_CLOTHES,
+        type: ERROR_SELL,
         playload: false
     })
 }
 
-const deleteClothes = (id) => async (dispatch) => {
+const deleteSell = (id) => async (dispatch) => {
     let res = new ResponseModel();
     try{
-        res = await deleteClothesAPI(id);
+        res = await deleteSellAPI(id);
         
         if(!res.error && res.status >= 200 && res.status <= 300){
             return dispatch({
-                type: DELETE_CLOTHES,
+                type: DELETE_SELL,
                 playload: id
             })
         }
     } catch(e){
         console.log(e);
-        console.log('ERROR! '+DELETE_CLOTHES);
+        console.log('ERROR! '+DELETE_SELL);
         console.log(res.status);
         console.log(res.error);
     }
     return dispatch({
-        type: ERROR_CLOTHES,
+        type: ERROR_SELL,
         playload: false
     })
 }
 
-export { getClothes, createClothes, updateClothes, deleteClothes }
+export { getSell, createSell, updateSell, deleteSell }

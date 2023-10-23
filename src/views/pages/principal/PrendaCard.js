@@ -17,12 +17,12 @@ export default class PrendaCard extends Component {
                     <CCardImg orientation="top" src={/*this.props.prenda.fotos[0].url*/''} />
                     <CCardBody>
                         <CCol>
-                        <span style={{float: "right"}}> <CIcon name="cil-star"/> 4.5</span>
-                        <h5>{this.props.prenda.vendedor}</h5>
+                        <span style={{float: "right"}}> <CIcon name="cil-star"/>{" " + this.props.prenda.rating.toFixed(1)}</span>
+                        <h5>{this.props.prenda.idVendedor.nombre + " " + this.props.prenda.idVendedor.apellido}</h5>
                         <h4>{this.props.prenda.nombre}</h4>
                         <h6>Talla: {this.props.prenda.talla}</h6>
                         <h6>S/ {this.props.prenda.precio}</h6>
-                        <h6>Detalles: {this.props.prenda.detalles !== "" ? "Si" : "No"}</h6>
+                        <h6>Detalles: {this.props.prenda.detalle !== "" ? "Si" : "No"}</h6>
                         </CCol>
                     </CCardBody>
                 </CCard>

@@ -22,17 +22,22 @@ export default class Prenda extends Component {
     render() {
         const prenda2 = {id: 2, nombre: "Polera H&M", precio: 10, talla: "XS", color: "Azul", detalles: "No", marca: "H&M", sexo: 1, categoría: "polo", material: "algodón", fotos: [{link: "https://hmperu.vtexassets.com/arquivos/ids/3685306/Casaca-polar-con-capucha---Negro---H-M-PE.jpg?v=1778013864"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Ocasi.on"}
         const fields = ['Tipo', 'Medida']
-        const medidaData = [{ Tipo: 'Cadera', Medida: this.props.location.state.prenda.idMedida[0].cadera }, { Tipo: 'Cintura', Medida: this.props.location.state.prenda.idMedida[0].cintura  }, { Tipo: 'Busto', Medida: this.props.location.state.prenda.idMedida[0].busto }, { Tipo: 'Largo Prenda', Medida: this.props.location.state.prenda.idMedida[0].largoTotal }, { Tipo: 'Largo Manga', Medida: this.props.location.state.prenda.idMedida[0].largoMangas }]
+        const medidaData = [{ Tipo: 'Cadera', Medida: this.props.location.state.prenda.idMedida.cadera || "-" }, 
+            { Tipo: 'Cintura', Medida: this.props.location.state.prenda.idMedida.cintura || "-"  }, 
+            { Tipo: 'Busto', Medida: this.props.location.state.prenda.idMedida.busto || "-" }, 
+            { Tipo: 'Largo Prenda', Medida: this.props.location.state.prenda.idMedida.largoTotal || "-" }, 
+            { Tipo: 'Largo Manga', Medida: this.props.location.state.prenda.idMedida.largoMangas || "-" }
+        ]
         return (
             <>
             <CRow>
                 <CCol xs="12" sm="8" className="m-auto">
                     <CRow>
                         <CCol xs="12" sm="2" className="align-items-start">
-                            {this.props.location.state.prenda.fotos.map(foto => (<CImg onClick={(e) => this.onClickImg(e)} fluid className="otras" rounded src={foto.url} ></CImg>))}
+                            {this.props.location.state.prenda.fotos.map((foto, index) => (<CImg key={index} onClick={(e) => this.onClickImg(e)} fluid className="otras" rounded="true" src={foto.url} ></CImg>))}
                         </CCol>
                         <CCol xs="12" sm="10" className="m-auto">
-                            <CImg fluid className="princi" rounded src={this.state.imageShow} ></CImg>
+                            <CImg fluid className="princi" rounded="true" src={this.state.imageShow} ></CImg>
                         </CCol>
                     </CRow>
                 </CCol>
@@ -40,14 +45,14 @@ export default class Prenda extends Component {
                     <CCard className="p-4 w-100">
                         <CCol>
                             <span>{this.props.location.state.prenda.vendedor}</span>
-                            <span style={{float: "right"}}> <CIcon name="cil-star"/> 4.5</span>
+                            <span style={{float: "right"}}> <CIcon name="cil-star"/> {" " + this.props.location.state.prenda.rating.toFixed(1)}</span>
                             <h4>{this.props.location.state.prenda.nombre}</h4>
                             <h6>Talla: {this.props.location.state.prenda.talla}</h6>
                             <h6>S/ {this.props.location.state.prenda.precio}</h6>
                             <h6>Color: {this.props.location.state.prenda.color}</h6>
                             <h6>Marca: {this.props.location.state.prenda.marca}</h6>
                             <h6>Material: {this.props.location.state.prenda.material}</h6>
-                            <h6>Detalles: {this.props.location.state.prenda.detalles}</h6>
+                            <h6>Detalles: {this.props.location.state.prenda.detalle}</h6>
                             <br/>
                             <Link className="link" to={{pathname: "./Pago", state: {prenda: this.props.location.state.prenda}}}>
                                 <CButton block color="primary">
@@ -106,14 +111,12 @@ export default class Prenda extends Component {
                                     </CRow>
                                     
                                     <h3>Preguntas realizadas</h3>
-                                    <div className='m-3'>
-                                        <h5>¿hacen envíos a Piura?</h5>
-                                        <span style={{"display":"inline-block", "margin-left": "40px" }}>  Hola, si hacemos envíos a todo el Perú</span>
-                                    </div>
-                                    <div className='m-3'>
-                                        <h5>¿El saco es de tela?</h5>
-                                        <span style={{"display":"inline-block", "margin-left": "40px" }}>Hola, el Saco es de tela fina y se puede lavar en lavadora</span>
-                                    </div>
+                                    {this.props.location.state.prenda.idConsulta.map((pregunta,index) => (
+                                        <div className='m-3' key={index}>
+                                            <h5>{pregunta.Pregunta}</h5>
+                                            <span style={{"display":"inline-block", "marginLeft": "40px" }}>  {pregunta.Respuesta || "-"}</span>
+                                        </div>
+                                    ))}
                                 </CCol>
                             </CTabPane>
                             <CTabPane>
@@ -128,11 +131,19 @@ export default class Prenda extends Component {
                                         <option value="1">Más útiles</option>
                                         </CSelect>
                                     </CCol>
-                                    <div className='m-3'>
-                                        <h5 style={{"margin-left": "40px" }}><CIcon name="cil-star"/> 4.5</h5>
-                                        <span > Me llegó el producto el día de entrega temprano. Muy bonito el polo que compré y estaba en muy buenas condiciones y lavado</span>
+                                    {/*this.props.location.state.prenda.comentarios.map(comentario => (
+                                        <div className='m-3'>
+                                        <h5 style={{"marginLeft": "40px" }}><CIcon name="cil-star"/>{" " + comentario.calificacion.toFixed(1)}</h5>
+                                        <span > {comentario.text}</span>
                                         <CButton  small color='primary' variant="ghost" style={{"float": "right" }}>¿es util?</CButton>
                                     </div>
+                                    ))*/}
+                                    <div className='m-3'>
+                                        <h5 style={{"marginLeft": "40px" }}><CIcon name="cil-star"/>{" " + this.props.location.state.prenda.rating.toFixed(1)}</h5>
+                                        <span > Me llegó el producto el día de entrega temprano. Muy bonito el polo que compré y estaba en muy buenas condiciones y lavado</span>
+                                        <CButton  small="true" color='primary' variant="ghost" style={{"float": "right" }}>¿es util?</CButton>
+                                    </div>
+                                    
                                 </CRow>
                             </CCol>
                             </CTabPane>
@@ -141,7 +152,7 @@ export default class Prenda extends Component {
                     </CCard>
                 </CCol>
                 <CCol  xs="12" sm="4" className="m-top">
-                    <PrendaCard prenda={prenda2} ></PrendaCard>
+                    <PrendaCard prenda={this.props.location.state.prenda} ></PrendaCard>
                 </CCol>
             </CRow>
             </>

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   CDropdown,
   CDropdownItem,
@@ -8,7 +9,9 @@ import {
 import CIcon from '@coreui/icons-react'
 import { Link } from 'react-router-dom';
 
-const TheHeaderDropdown = () => {
+const TheHeaderDropdown = ({ loginAuth }) => {
+
+  const user = useSelector(state => state.auth.user);
   return (
     <CDropdown
       inNav
@@ -26,9 +29,9 @@ const TheHeaderDropdown = () => {
           </Link>
         </CDropdownItem>
         <CDropdownItem divider />
-        <CDropdownItem>
+        <CDropdownItem onClick={() => loginAuth()}>
           <CIcon name="cil-lock-locked" className="mfe-2" />
-          Cerrar sesión
+          {user ? 'Cerrar Sesión' : 'Iniciar Sesión'}
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>

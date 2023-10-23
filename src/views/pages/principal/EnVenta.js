@@ -2,16 +2,33 @@ import { CButton, CTabPane, CInputFile, CCol, CRow, CNavItem, CNavLink, CTabCont
 import React, { Component } from 'react'
 import PrendasCardHorizontal from './PrendaCardHorizontal';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as clothesActions from '../../../services/redux/actions/prenda'
 
-export default class EnVenta extends Component {
+class EnVenta extends Component {
     constructor(props){
         super(props);
         this.state = {
             collapse: 0,
             validarPago: false,
-            cotizarEnvio: false
+            cotizarEnvio: false,
+            clothes: [],
+            user: {}
         }
     }
+    async componentDidMount(){
+        await this.props.getClothes()
+        let clothes = this.props.clothes.filter(cloth => cloth.idVendedor.idUsuario === this.props.user.idUsuario)
+        this.setState({clothes: clothes, user: this.props.user})
+
+    }
+
+    onDelete = (id) => {
+        this.props.deleteClothes(id)
+        this.setState({clothes: this.state.clothes.filter(cloth => cloth.idPrenda !== id)})
+    }
+
     onClickVP = () => {
         this.setState({validarPago: true})
     }
@@ -28,11 +45,9 @@ export default class EnVenta extends Component {
     return (
         <>
         <h3>Prendas en venta</h3>
-        <Link to="/nuevo">
+        <Link to="/en-venta/nuevo">
         <CButton className="m-3" color='primary'>
-            
                 Nueva prenda
-            
         </CButton>
         </Link>
         <CTabs>
@@ -77,10 +92,10 @@ export default class EnVenta extends Component {
                     <CCol xs="12" md="11" className="m-3">
                         <h3>Prendas en venta</h3>
                         <CRow>   
-                            {prendaData.map(prenda => (
-                                <CCol md="6">
+                            {this.state.clothes.map((prenda, index) => (
+                                <CCol md="6" key={index}>
                                     <CCard>
-                                        <PrendasCardHorizontal prenda={prenda} modo={"enventa"} edit={true}/>
+                                        <PrendasCardHorizontal prenda={prenda} modo={"enventa"} onDelete={this.onDelete} edit={true}/>
                                     </CCard>
                                 </CCol>
                             ))}  
@@ -325,3 +340,18 @@ export default class EnVenta extends Component {
     )
   }
 }
+
+const mapStateToProps = state => {
+    return {
+        clothes: state.prenda.clothes,
+        user: state.auth.user
+    }
+  }
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+        ...bindActionCreators(Object.assign({},clothesActions), dispatch)
+    }
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(EnVenta)

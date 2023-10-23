@@ -3,14 +3,23 @@ CLabel, CInput, CModalFooter, CModal, CModalHeader, CModalTitle, CTextarea } fro
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import PrendasCardHorizontal from './PrendaCardHorizontal';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as sellActions from '../../../services/redux/actions/venta'
 
-export default class Comprados extends Component {
+class Comprados extends Component {
     constructor(props){
         super(props);
         this.state = {
             collapse: 0,
-            calificar: false
+            calificar: false,
+            sell: []
         }
+    }
+
+    async componentDidMount(){
+        await this.props.getSell(this.props.user.idUsuario)
+        this.setState({sell: this.props.sell})
     }
 
     render() {
@@ -288,3 +297,18 @@ export default class Comprados extends Component {
         )
     }
 }
+
+const mapStateToProps = state => {
+    return {
+        user: state.auth.user,
+        sell: state.sell
+    }
+  }
+  
+  const mapDispatchToProps = dispatch => {
+    return {
+        ...bindActionCreators(Object.assign({},sellActions), dispatch)
+    }
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Comprados)

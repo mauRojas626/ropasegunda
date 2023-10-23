@@ -11,17 +11,68 @@ class InformacionUsuario extends Component {
         collapse: 0,
         isLoading: true,
         failed: false,
-        usuarios: []
+        usuario: [],
+        tipoDoc: 1,
     }
   }
   
   
   async componentDidMount(){
-    await this.props.getBuyers();
-    this.setState({usuarios: this.props.buyer})
+    this.setState({usuario: this.props.user})
+    if(this.props.user.dni.length === 8){
+      this.setState({tipoDoc: 1})
+    } else {
+      this.setState({tipoDoc: 2})
+    }
 
   }
 
+  onchange = (key) => (e) => {
+    switch (key) {
+      case 'nombre':
+        this.setState({usuario: {...this.state.usuario, nombre: e.target.value}})
+        break;
+      case 'apellido':
+        this.setState({usuario: {...this.state.usuario, apellido: e.target.value}})
+        break;
+      case 'email':
+        this.setState({usuario: {...this.state.usuario, correo: e.target.value}})
+        break;
+      case 'address':
+        this.setState({usuario: {...this.state.usuario, direccion: e.target.value}})
+        break;
+      case 'celular':
+        this.setState({usuario: {...this.state.usuario, celular: e.target.value}})
+        break;
+      case 'dni':
+        this.setState({usuario: {...this.state.usuario, dni: e.target.value}})
+        break;
+      case 'ruc':
+        this.setState({usuario: {...this.state.usuario, idVendedor: {...this.state.usuario.idVendedor, ruc: e.target.value}}})
+        break;
+      case 'delivery':
+        this.setState({usuario: {...this.state.usuario, idVendedor: {...this.state.usuario.idVendedor, delivery: e.target.value}}})
+        break;
+      case 'agencia':
+        this.setState({usuario: {...this.state.usuario, idVendedor: {...this.state.usuario.idVendedor, agencia: e.target.value}}})
+        break;
+      case 'cintura':
+        this.setState({usuario: {...this.state.usuario, idMedida: {...this.state.usuario.idMedida, cintura: e.target.value}}})
+        break;
+      case 'busto':
+        this.setState({usuario: {...this.state.usuario, idMedida: {...this.state.usuario.idMedida, busto: e.target.value}}})
+        break;
+      case 'cadera':
+        this.setState({usuario: {...this.state.usuario, idMedida: {...this.state.usuario.idMedida, cadera: e.target.value}}})
+        break;
+      default:
+        break;
+    }
+  }
+
+  onchangeDoc = (e) => {
+    this.setState({tipoDoc: e.target.value})
+  }
   render() {
     return (
       <>
@@ -31,28 +82,28 @@ class InformacionUsuario extends Component {
                 <h3>Datos Personales</h3>
                 <CFormGroup className="mt-4">
                     <CLabel htmlFor="name">Nombre</CLabel>
-                    <CInput id="nombre" placeholder="Ingrese su nombre" required />
+                    <CInput id="nombre" placeholder="Ingrese su nombre" required onChange={this.onchange} value={this.state.usuario.nombre}/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="lastname">Apellido</CLabel>
-                    <CInput id="apellido" placeholder="Ingrese su apellido" required />
+                    <CInput id="apellido" placeholder="Ingrese su apellido" required onChange={this.onchange} value={this.state.usuario.apellido}/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="email">Correo Electrónico</CLabel>
-                    <CInput id="email" placeholder="Ingrese su correo" required />
+                    <CInput id="email" placeholder="Ingrese su correo" required onChange={this.onchange} value={this.state.usuario.correo}/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="address">Dirección</CLabel>
-                    <CInput id="address" placeholder="Ingrese su dirección" required />
+                    <CInput id="address" placeholder="Ingrese su dirección" required onChange={this.onchange} value={this.state.usuario.direccion}/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel>Departamento</CLabel>
                     <CSelect custom name="departamento" id="department">
-                    <option value="1">Lima</option>
-                    <option value="2">Ica</option>
-                    <option value="3">Arequipa</option>
-                    <option value="4">Moquegua</option>
-                    <option value="5">Tacna</option>
+                    <option value="Lima">Lima</option>
+                    <option value="Ica">Ica</option>
+                    <option value="Arequipa">Arequipa</option>
+                    <option value="Moquegua">Moquegua</option>
+                    <option value="Tacna">Tacna</option>
                     <option value="6">Tumbes</option>
                     <option value="7">Piura</option>
                     <option value="8">La Libertad</option>
@@ -79,25 +130,25 @@ class InformacionUsuario extends Component {
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel>Buscas prendas para</CLabel>
-                    <CSelect custom name="gender" id="gender">
+                    <CSelect custom name="gender" id="gender" value={this.state.usuario.genero} onChange={this.onchange}>
+                    <option value="0">Mujer</option>
                     <option value="1">Hombre</option>
-                    <option value="2">Mujer</option>
                     </CSelect>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Celular</CLabel>
-                    <CInput id="celular" placeholder="Ingrese su celular" required />
+                    <CInput id="celular" placeholder="Ingrese su celular" required onChange={this.onchange} value={this.state.usuario.celular}/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Documento de identificación</CLabel>
                     <CInputGroup>
                     <CInputGroupPrepend>
-                        <CSelect custom name="doc" id="doc">
+                        <CSelect custom name="doc" id="doc" onChange={this.onchangeDoc} value={this.state.tipoDoc}>
                         <option value="1">DNI</option>
                         <option value="2">CE</option>
                         </CSelect>
                     </CInputGroupPrepend>
-                    <CInput type="email" id="username3" name="username3" autoComplete="name"/>
+                    <CInput type="text" id="username3" name="dni" value={this.state.usuario.dni} onChange={this.onchange}/>
                   </CInputGroup>
                 </CFormGroup>
             </CCol>
@@ -105,24 +156,24 @@ class InformacionUsuario extends Component {
                 <h3>Medidas</h3>
                 <CFormGroup className="mt-3">
                     <CLabel type='number'>Cintura (cm)</CLabel>
-                    <CInput id="cintura" placeholder="Ingrese su medida de cintura" required />
+                    <CInput id="cintura" placeholder="Ingrese su medida de cintura" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idMedida.cintura : "" }/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Busto (cm)</CLabel>
-                    <CInput id="busto" placeholder="Ingrese su medida de busto" required />
+                    <CInput id="busto" placeholder="Ingrese su medida de busto" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idMedida.busto : "" }/>
                 </CFormGroup>
                 <CFormGroup className="mb-5">
                     <CLabel type='number'>Cadera (cm)</CLabel>
-                    <CInput id="cadera" placeholder="Ingrese su medida de cadera" required />
+                    <CInput id="cadera" placeholder="Ingrese su medida de cadera" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idMedida.cadera : "" }/>
                 </CFormGroup>
                 <h3>Datos de Venta</h3>
                 <CFormGroup className="mt-4">
                     <CLabel type='text'>Empresa de delivery a domicilio utilizada</CLabel>
-                    <CInput id="delivery" placeholder="Ingrese su empresa de delivery a domicilio" required />
+                    <CInput id="delivery" placeholder="Ingrese su empresa de delivery a domicilio" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idVendedor.delivery : "" }/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='text'>Empresa de delivery con recojo en agencia utilizada</CLabel>
-                    <CInput id="agencia" placeholder="Ingrese su empresa de delivery en agencia" required />
+                    <CInput id="agencia" placeholder="Ingrese su empresa de delivery en agencia" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idVendedor.agencia : "" }/>
                 </CFormGroup>
                 <CFormGroup>
                   <CLabel>QR yape</CLabel>
@@ -144,7 +195,7 @@ class InformacionUsuario extends Component {
                 </CFormGroup>
                 <CFormGroup className="mt-4">
                     <CLabel type='number'>Ruc NRUS</CLabel>
-                    <CInput id="ruc" placeholder="Ingrese su número de RUC" required />
+                    <CInput id="ruc" placeholder="Ingrese su número de RUC" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idVendedor.ruc : "" }/>
                 </CFormGroup>
             </CCol>
         </CRow>
@@ -162,7 +213,8 @@ class InformacionUsuario extends Component {
 
 const mapStateToProps = state => {
   return {
-      buyer: state.comprador.buyers
+      buyer: state.comprador.buyers,
+      user: state.auth.user
   }
 }
 

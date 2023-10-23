@@ -96,8 +96,9 @@ const routes = [
   { path: '/comprados', exact: true, name: 'Comprados', component: Comprados },
   { path: '/entrega', exact: true, name: 'Entrega', component: Entrega },
   { path: '/perfil', exact: true, name: 'Perfil', component: Perfil },
+  { path: '/en-venta/nuevo', exact: true, name: 'Nuevo', component: Nuevo },
+  { path: '/en-venta/editar', exact: true, name: 'Editar', component: Nuevo },
   { path: '/en-venta', exact: true, name: 'En Venta', component: EnVenta },
-  { path: '/nuevo', exact: true, name: 'Nuevo', component: Nuevo },
   { path: '/admin', exact: true, name: 'Admin', component: Admin }
 ];
 
