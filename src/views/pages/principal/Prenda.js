@@ -18,7 +18,8 @@ class Prenda extends Component {
             pregunta: "",
             consultas: this.props.location.state.prenda.idConsulta,
             compra: false,
-            modal: false
+            modal: false,
+            modal2: false,
         }
     }
 
@@ -29,12 +30,16 @@ class Prenda extends Component {
     }
 
     comprar = async () => {
-        let res = await this.props.blockClothes(this.props.location.state.prenda.idPrenda)
-        if(res.type === "BLOCK_CLOTHES"){
-            this.setState({compra: true, modal: true})
+        if(this.props.auth === false){
+            this.setState({modal2: true})
         } else {
-            this.setState({compra: false, modal: true})
-        }
+            let res = await this.props.blockClothes(this.props.location.state.prenda.idPrenda)
+            if(res.type === "BLOCK_CLOTHES"){
+                this.setState({compra: true, modal: true})
+            } else {
+                this.setState({compra: false, modal: true})
+            }
+        }   
     }
 
     render() {
@@ -61,6 +66,17 @@ class Prenda extends Component {
                     <Link className="link" to={{pathname: "./Pago", state: {prenda: this.props.location.state.prenda}}} >
                         <CButton color="primary" onClick={() => this.setState({modal: false})}>Aceptar</CButton>
                     </Link>
+                </CModalFooter>
+            </CModal>
+            <CModal show={this.state.modal2} onClose={() => this.setState({modal2: false})} >
+                <CModalHeader>
+                    <CModalTitle>{"Inicia sesión"}</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    {"Para poder comprar la prenda, debes iniciar sesión"}
+                </CModalBody>
+                <CModalFooter>
+                    <CButton color="primary" onClick={() => this.setState({modal2: false})}>Aceptar</CButton>
                 </CModalFooter>
             </CModal>
             <CRow>
@@ -191,7 +207,7 @@ class Prenda extends Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.auth.user
+        auth: state.auth.isAuthenticated
     }
   }
   

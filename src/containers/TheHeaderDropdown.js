@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import {
   CDropdown,
   CDropdownItem,
@@ -22,13 +22,13 @@ const TheHeaderDropdown = ({ loginAuth }) => {
           <CIcon name="cil-user" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownItem>
+        {user ?<><CDropdownItem>
           <Link className="link" to="/perfil">
             <CIcon name="cil-user" className="mfe-2" />
             Perfil
           </Link>
         </CDropdownItem>
-        <CDropdownItem divider />
+        <CDropdownItem divider /></> : null}
         <CDropdownItem onClick={() => loginAuth()}>
           <CIcon name="cil-lock-locked" className="mfe-2" />
           {user ? 'Cerrar Sesión' : 'Iniciar Sesión'}

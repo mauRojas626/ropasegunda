@@ -1,4 +1,4 @@
-import { CRow, CCol, CFormGroup, CLabel, CInput, CSelect, CInputFile, CButton, CInputGroup, CInputGroupPrepend } from '@coreui/react'
+import { CRow, CCol, CFormGroup, CLabel, CInput, CSelect, CInputFile, CButton } from '@coreui/react'
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -32,12 +32,6 @@ class InformacionUsuario extends Component {
       await this.props.getCities()
     }
     this.setState({provincia: this.props.provincia, departamento: this.props.departamento})
-    if(!(this.props.user.dni == undefined) && this.props.user.dni.length === 8){
-      this.setState({tipoDoc: 1})
-    } else {
-      this.setState({tipoDoc: 2})
-    }
-
   }
 
   onSubmit = async () => {
@@ -112,6 +106,7 @@ class InformacionUsuario extends Component {
         break;
       case 'gender':
         this.setState({usuario: {...this.state.usuario, genero: e.target.value}})
+        break;
       default:
         break;
     }
@@ -121,7 +116,7 @@ class InformacionUsuario extends Component {
     this.setState({tipoDoc: e.target.value})
   }
   render() {
-    const provincia = this.state.provincia.filter(provincia => provincia.idDepartamento == this.state.idDepartamento)
+    const provincia = this.state.provincia.filter(provincia => parseInt(provincia.idDepartamento) === parseInt(this.state.idDepartamento))
     const { createResults } = this.state
     return (
       <>
@@ -174,15 +169,7 @@ class InformacionUsuario extends Component {
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Documento de identificación</CLabel>
-                    <CInputGroup>
-                    <CInputGroupPrepend>
-                        <CSelect custom name="doc" id="doc" onChange={this.onchangeDoc} value={this.state.tipoDoc}>
-                        <option value="1">DNI</option>
-                        <option value="2">CE</option>
-                        </CSelect>
-                    </CInputGroupPrepend>
                     <CInput type="text" id="dni" name="dni" value={this.state.usuario.dni} onChange={this.onchange}/>
-                  </CInputGroup>
                 </CFormGroup>
             </CCol>
             <CCol md="6" className="mb-4">

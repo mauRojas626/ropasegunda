@@ -17,7 +17,7 @@ import {
   CModalFooter,
   CButton
 } from '@coreui/react'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import CIcon from '@coreui/icons-react'
 import { updateQuestion } from 'src/services/redux/actions/consulta'
 

@@ -42,7 +42,7 @@ class Pago extends Component {
 
     async componentWillUnmount() {
         clearInterval(this.countdown);
-        await this.props.unBlockCothes(this.props.location.state.prenda.idPrenda)
+        await this.props.unBlockClothes(this.props.location.state.prenda.idPrenda)
     }
 
     onSubmit = async () => {

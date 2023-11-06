@@ -15,14 +15,14 @@ const FileUpload = ({modo, newPhoto, removePhoto, fotosOld}) => {
         ])
         newPhoto(acceptedFiles)
       }
-      else if(acceptedFiles.length = 1) {
+      else if(acceptedFiles.length === 1) {
             setFiles(acceptedFiles.map(file =>
               Object.assign(file, {url: URL.createObjectURL(file)})
             ));
             newPhoto(acceptedFiles[0])
       }
       
-    }, [])
+    }, [m, newPhoto])
     const { getRootProps, getInputProps, isDragActive } = useDropzone({onDrop, accept: {'image/*': []}})
 
     const removeFile = (name) => {
@@ -48,7 +48,7 @@ const FileUpload = ({modo, newPhoto, removePhoto, fotosOld}) => {
                 </CCol>
             ))
         }
-      </CRow> : <></>}
+      </CRow> : null}
     </CCol>
   );
 };

@@ -261,13 +261,13 @@ class EnVenta extends Component {
                                                 <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
                                                     <span>Cliente: {venta[0].idComprador.nombre + " " + venta[0].idComprador.apellido}</span>
                                                     <span> Dirección: {venta[0].idEnvio.direccion}</span>
-                                                    <span>Entrega: {venta[0].idEnvio.tipoEntrega == 2 ? "A domicilio" : "En agencia"}</span>
+                                                    <span>Entrega: {parseInt(venta[0].idEnvio.tipoEntrega) === 2 ? "A domicilio" : "En agencia"}</span>
                                                 </CRow>
                                             </CButton>
                                         </CCol>
                                         <CCol md="2">
-                                            <CButton color='primary' size='sm' onClick={() => this.onClickCE(venta[0])} disabled={venta[0].estado == 3}>
-                                                {venta[0].estado == 2 ? "Cotizar envío" : venta[0].estado == 4 ? "Confirmar pago" : venta[0].estado == 3 ? "Esperando pago" : "Enviado"}
+                                            <CButton color='primary' size='sm' onClick={() => this.onClickCE(venta[0])} disabled={parseInt(venta[0].estado) === 3}>
+                                                {parseInt(venta[0].estado) === 2 ? "Cotizar envío" : parseInt(venta[0].estado) === 4 ? "Confirmar pago" : parseInt(venta[0].estado) === 3 ? "Esperando pago" : "Enviado"}
                                             </CButton>
                                         </CCol>
                                     </CRow>
@@ -308,7 +308,7 @@ class EnVenta extends Component {
                                                 <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
                                                     <span>Cliente: {venta[0].idComprador.nombre + " " + venta[0].idComprador.apellido}</span>
                                                     <span> Dirección: {venta[0].idEnvio.direccion}</span>
-                                                    <span>Entrega: {venta[0].idEnvio.tipoEntrega == 2 ? "A domicilio" : "En agencia"}</span>
+                                                    <span>Entrega: {parseInt(venta[0].idEnvio.tipoEntrega) === 2 ? "A domicilio" : "En agencia"}</span>
                                                 </CRow>
                                             </CButton>
                                         </CCol>

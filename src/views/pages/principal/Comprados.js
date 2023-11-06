@@ -272,7 +272,7 @@ class Comprados extends Component {
                                                                 <span>{sell[0].idVendedor.nombre + " " + sell[0].idVendedor.apellido} </span>
                                                                 <span> {sell.length === 1 ? "1 prenda" : sell.length + " prendas"}</span>
                                                                 <span> Fecha estimada: {sell[0].idEnvio.fechaEntrega ? new Date(sell[0].idEnvio.fechaEntrega).toISOString().slice(0,10) : "Por confirmar" }</span>
-                                                                <span>Estado: <CBadge shape='pill' color='dark'>{sell[0].estado == 4 ? "confirmando pago" : sell[0].estado == 5 ? "preparando pedido": "En camino"}</CBadge></span>
+                                                                <span>Estado: <CBadge shape='pill' color='dark'>{parseInt(sell[0].estado) === 4 ? "confirmando pago" : parseInt(sell[0].estado) === 5 ? "preparando pedido": "En camino"}</CBadge></span>
                                                             </CRow>
                                                         </CButton>
                                                     </CCol>

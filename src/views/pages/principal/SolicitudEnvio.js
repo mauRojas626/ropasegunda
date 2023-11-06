@@ -77,8 +77,7 @@ class SolicitudEnvio extends Component {
 
     render() {
         const errors = this.state.error
-        console.log(errors)
-        let provincia = this.state.provincia.filter(provincia => provincia.idDepartamento == this.state.selectDepartamento)
+        let provincia = this.state.provincia.filter(provincia => parseInt(provincia.idDepartamento) === parseInt(this.state.selectDepartamento))
         return (
             <>
             <h2>Entrega</h2>

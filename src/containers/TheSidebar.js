@@ -13,11 +13,12 @@ import {
 } from '@coreui/react'
 
 // sidebar nav config
-import navigation from './_nav'
+import { comprador, vendedor, invitado, admin } from './_nav'
 
 const TheSidebar = () => {
   const dispatch = useDispatch()
   const show = useSelector(state => state.changeState.sidebarShow)
+  const user = useSelector(state => state.auth.user)
 
   return (
     <CSidebar
@@ -29,7 +30,7 @@ const TheSidebar = () => {
       </CSidebarBrand>
       <CSidebarNav>
         <CCreateElement
-          items={navigation}
+          items={user == null ? invitado : user.correo === 'admin' ? admin : user.idVendedor === 0 ? comprador :  vendedor}
           components={{
             CSidebarNavDivider,
             CSidebarNavDropdown,
