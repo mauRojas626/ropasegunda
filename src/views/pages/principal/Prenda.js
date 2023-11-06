@@ -1,26 +1,44 @@
-import { CButton, CCard, CNav, CTabs, CCol, CImg, CRow, CNavItem,CNavLink, CTabContent, CTabPane, CDataTable, CInput, CInputGroupAppend, CInputGroup, CSelect } from '@coreui/react';
+import { CButton, CCard, CNav, CTabs, CCol, CRow, CNavItem,CNavLink, CTabContent, CTabPane, CDataTable, CInput, CInputGroupAppend, 
+    CInputGroup, CCarouselInner, CCarousel, CCarouselControl, CCarouselItem, CModal, CModalHeader, CModalBody, CModalFooter, CModalTitle } from '@coreui/react';
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
 import PrendaCard from './PrendaCard';
 import CIcon from '@coreui/icons-react';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import * as consultaActions from '../../../services/redux/actions/consulta'
+import * as prendaActions from '../../../services/redux/actions/prenda'
 
 
-export default class Prenda extends Component {
+
+class Prenda extends Component {
     constructor(props){
         super(props);
         this.state = {
-            imageShow: this.props.location.state.prenda.fotos[0].url
+            pregunta: "",
+            consultas: this.props.location.state.prenda.idConsulta,
+            compra: false,
+            modal: false
         }
     }
 
-    
+    preguntar = async () => {
+        let consulta = { Pregunta: this.state.pregunta, idPrenda: this.props.location.state.prenda.idPrenda }
+        await this.props.createQuestion(consulta)
+        this.setState({pregunta: "", consultas: [...this.state.consultas, consulta]})
+    }
 
-    onClickImg = (e) => {
-        this.setState({imageShow: e.target.src})
+    comprar = async () => {
+        let res = await this.props.blockClothes(this.props.location.state.prenda.idPrenda)
+        if(res.type === "BLOCK_CLOTHES"){
+            this.setState({compra: true, modal: true})
+        } else {
+            this.setState({compra: false, modal: true})
+        }
     }
 
     render() {
-        const prenda2 = {id: 2, nombre: "Polera H&M", precio: 10, talla: "XS", color: "Azul", detalles: "No", marca: "H&M", sexo: 1, categoría: "polo", material: "algodón", fotos: [{link: "https://hmperu.vtexassets.com/arquivos/ids/3685306/Casaca-polar-con-capucha---Negro---H-M-PE.jpg?v=1778013864"}, {link: "https://www.panoramaweb.com.mx/u/fotografias/m/2022/8/2/f850x638-33802_111291_5050.jpg"}], fechaPublicacion: "", vendedor: "Ocasi.on"}
+        const consultas = this.state.consultas
         const fields = ['Tipo', 'Medida']
         const medidaData = [{ Tipo: 'Cadera', Medida: this.props.location.state.prenda.idMedida.cadera || "-" }, 
             { Tipo: 'Cintura', Medida: this.props.location.state.prenda.idMedida.cintura || "-"  }, 
@@ -28,17 +46,38 @@ export default class Prenda extends Component {
             { Tipo: 'Largo Prenda', Medida: this.props.location.state.prenda.idMedida.largoTotal || "-" }, 
             { Tipo: 'Largo Manga', Medida: this.props.location.state.prenda.idMedida.largoMangas || "-" }
         ]
+        const comentarios = this.props.location.state.prenda.idVendedor.comentarios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha))
         return (
+            
             <>
+            <CModal show={this.state.modal} onClose={() => this.setState({modal: false})} >
+                <CModalHeader>
+                    <CModalTitle>{this.state.compra ? "Comprar prenda" : "Prenda Vendida"}</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    {this.state.compra ? "Recuerde que solo tiene 3 minutos para realizar el pago de la prenda" : "La prenda ya ha sido vendida"}
+                </CModalBody>
+                <CModalFooter>
+                    <Link className="link" to={{pathname: "./Pago", state: {prenda: this.props.location.state.prenda}}} >
+                        <CButton color="primary" onClick={() => this.setState({modal: false})}>Aceptar</CButton>
+                    </Link>
+                </CModalFooter>
+            </CModal>
             <CRow>
                 <CCol xs="12" sm="8" className="m-auto">
-                    <CRow>
-                        <CCol xs="12" sm="2" className="align-items-start">
-                            {this.props.location.state.prenda.fotos.map((foto, index) => (<CImg key={index} onClick={(e) => this.onClickImg(e)} fluid className="otras" rounded="true" src={foto.url} ></CImg>))}
-                        </CCol>
-                        <CCol xs="12" sm="10" className="m-auto">
-                            <CImg fluid className="princi" rounded="true" src={this.state.imageShow} ></CImg>
-                        </CCol>
+                    <CRow className='m-auto'>
+                        <CCarousel className='m-auto'>
+                            <CCarouselInner>
+                                {this.props.location.state.prenda.fotos.map((foto, index) =>
+                                    <CCarouselItem key={index}>
+                                        <img className="d-block w-100" src={foto.url} alt={"imagen " + index}/>
+                                    </CCarouselItem>
+                                )}
+                                
+                            </CCarouselInner>
+                            <CCarouselControl direction="prev"/>
+                            <CCarouselControl direction="next"/>
+                        </CCarousel>
                     </CRow>
                 </CCol>
                 <CCol xs="12" sm="4">
@@ -54,11 +93,9 @@ export default class Prenda extends Component {
                             <h6>Material: {this.props.location.state.prenda.material}</h6>
                             <h6>Detalles: {this.props.location.state.prenda.detalle}</h6>
                             <br/>
-                            <Link className="link" to={{pathname: "./Pago", state: {prenda: this.props.location.state.prenda}}}>
-                                <CButton block color="primary">
-                                    Comprar
-                                </CButton>
-                            </Link>
+                            <CButton block color="primary" onClick={this.comprar}>
+                                Comprar
+                            </CButton>
                         </CCol>
                     </CCard>
                     
@@ -103,15 +140,15 @@ export default class Prenda extends Component {
                                     <CRow md="10" className="mb-5"> 
                                         <h3>Pregúntale al vendedor</h3>
                                         <CInputGroup>
-                                        <CInput type="text" id="input2-group2" name="input2-group2" placeholder="Hacer una pregunta" />
+                                        <CInput type="text" id="input2-group2" name="input2-group2" placeholder="Hacer una pregunta" value={this.state.pregunta} onChange={(e) => this.setState({pregunta: e.target.value})}/>
                                         <CInputGroupAppend>
-                                            <CButton type="button" color="primary">Preguntar</CButton>
+                                            <CButton type="button" color="primary" onClick={this.preguntar}>Preguntar</CButton>
                                         </CInputGroupAppend>
                                         </CInputGroup>
                                     </CRow>
                                     
                                     <h3>Preguntas realizadas</h3>
-                                    {this.props.location.state.prenda.idConsulta.map((pregunta,index) => (
+                                    {consultas.map((pregunta,index) => (
                                         <div className='m-3' key={index}>
                                             <h5>{pregunta.Pregunta}</h5>
                                             <span style={{"display":"inline-block", "marginLeft": "40px" }}>  {pregunta.Respuesta || "-"}</span>
@@ -122,28 +159,20 @@ export default class Prenda extends Component {
                             <CTabPane>
                             <CCol xs="12" md="11" className="m-3">
                                 <CRow>
-                                    <CCol xs="12" md="8">
+                                    <CCol xs="12" md="12">
                                         <h3>Comentarios</h3>
                                     </CCol>
-                                    <CCol xs="12" md="4">
-                                        <CSelect custom name="select" id="select">
-                                        <option value="0">Más recientes</option>
-                                        <option value="1">Más útiles</option>
-                                        </CSelect>
-                                    </CCol>
-                                    {/*this.props.location.state.prenda.comentarios.map(comentario => (
-                                        <div className='m-3'>
-                                        <h5 style={{"marginLeft": "40px" }}><CIcon name="cil-star"/>{" " + comentario.calificacion.toFixed(1)}</h5>
-                                        <span > {comentario.text}</span>
-                                        <CButton  small color='primary' variant="ghost" style={{"float": "right" }}>¿es util?</CButton>
-                                    </div>
-                                    ))*/}
-                                    <div className='m-3'>
-                                        <h5 style={{"marginLeft": "40px" }}><CIcon name="cil-star"/>{" " + this.props.location.state.prenda.rating.toFixed(1)}</h5>
-                                        <span > Me llegó el producto el día de entrega temprano. Muy bonito el polo que compré y estaba en muy buenas condiciones y lavado</span>
-                                        <CButton  small="true" color='primary' variant="ghost" style={{"float": "right" }}>¿es util?</CButton>
-                                    </div>
-                                    
+                                    {comentarios.map(comentario => (
+                                        <CRow className='m-auto'>
+                                            <CCol md="2" className='m-auto'>
+                                                <h5><CIcon name="cil-star"/>{" " + comentario.calificacion.toFixed(1)}</h5>
+                                            </CCol>
+                                            <CCol md="10">
+                                                <span > {comentario.texto}</span>
+                                            </CCol>
+                                            
+                                        </CRow>
+                                    ))}
                                 </CRow>
                             </CCol>
                             </CTabPane>
@@ -160,5 +189,16 @@ export default class Prenda extends Component {
     }
 }
 
-
+const mapStateToProps = state => {
+    return {
+        user: state.auth.user
+    }
+  }
   
+const mapDispatchToProps = dispatch => {
+    return {
+        ...bindActionCreators(Object.assign({},consultaActions, prendaActions), dispatch)
+    }
+}
+  
+export default connect(mapStateToProps, mapDispatchToProps)(Prenda)

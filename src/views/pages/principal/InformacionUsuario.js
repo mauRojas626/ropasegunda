@@ -3,6 +3,9 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as buyerActions from '../../../services/redux/actions/comprador'
+import * as authActions from '../../../services/redux/actions/auth'
+import notification from 'src/services/models/notificacion'
+import Notification from '../common/Notification'
 
 class InformacionUsuario extends Component {
   constructor(props){
@@ -12,14 +15,24 @@ class InformacionUsuario extends Component {
         isLoading: true,
         failed: false,
         usuario: [],
+        provincia: [],
+        departamento: [],
         tipoDoc: 1,
+        idDepartamento: 1,
+        yape: "",
+        plin: "",
+        createResults: [],
     }
   }
   
   
   async componentDidMount(){
     this.setState({usuario: this.props.user})
-    if(this.props.user.dni.length === 8){
+    if(this.props.departamento.length === 0){
+      await this.props.getCities()
+    }
+    this.setState({provincia: this.props.provincia, departamento: this.props.departamento})
+    if(!(this.props.user.dni == undefined) && this.props.user.dni.length === 8){
       this.setState({tipoDoc: 1})
     } else {
       this.setState({tipoDoc: 2})
@@ -27,8 +40,28 @@ class InformacionUsuario extends Component {
 
   }
 
-  onchange = (key) => (e) => {
-    switch (key) {
+  onSubmit = async () => {
+    const formData = new FormData();
+    if(this.state.yape !== ""){
+      const newFileName = `${Date.now()}_${this.state.yape.name}`
+      formData.append('yape', this.state.yape, newFileName)
+    }
+    if(this.state.plin !== ""){
+      const newFileName = `${Date.now()}_${this.state.plin.name}`
+      formData.append('plin', this.state.plin, newFileName)
+    }
+    formData.append('user', JSON.stringify(this.state.usuario));
+    let res = await this.props.updateBuyer(formData)
+    if(res.type === "UPDATE_BUYER"){
+      let newNotification = new notification('success', 'Actualización exitoso', 'Usuario actualizado correctamente')
+      this.setState({createResults: [...this.state.createResults, newNotification]})
+      this.props.updateUser(this.state.usuario)
+      this.setState({usuario: this.props.user})
+    }
+  }
+
+  onchange = (e) => {
+    switch (e.target.id) {
       case 'nombre':
         this.setState({usuario: {...this.state.usuario, nombre: e.target.value}})
         break;
@@ -42,7 +75,7 @@ class InformacionUsuario extends Component {
         this.setState({usuario: {...this.state.usuario, direccion: e.target.value}})
         break;
       case 'celular':
-        this.setState({usuario: {...this.state.usuario, celular: e.target.value}})
+        this.setState({usuario: {...this.state.usuario, telefono: e.target.value}})
         break;
       case 'dni':
         this.setState({usuario: {...this.state.usuario, dni: e.target.value}})
@@ -65,6 +98,20 @@ class InformacionUsuario extends Component {
       case 'cadera':
         this.setState({usuario: {...this.state.usuario, idMedida: {...this.state.usuario.idMedida, cadera: e.target.value}}})
         break;
+      case 'department':
+        this.setState({idDepartamento: e.target.value})
+        break;
+      case 'provincia':
+        this.setState({usuario: {...this.state.usuario, idProvincia: e.target.value}})
+        break;
+      case 'yape':
+        this.setState({yape: e.target.files[0]})
+        break;
+      case 'plin':
+        this.setState({plin: e.target.files[0]})
+        break;
+      case 'gender':
+        this.setState({usuario: {...this.state.usuario, genero: e.target.value}})
       default:
         break;
     }
@@ -74,9 +121,11 @@ class InformacionUsuario extends Component {
     this.setState({tipoDoc: e.target.value})
   }
   render() {
+    const provincia = this.state.provincia.filter(provincia => provincia.idDepartamento == this.state.idDepartamento)
+    const { createResults } = this.state
     return (
       <>
-        
+        {createResults.length >= 1 ?  createResults.map((notification, index) => <Notification key={index} notif={notification} />) : <></>}
         <CRow className="m-auto">
             <CCol md="6" className="mb-4">
                 <h3>Datos Personales</h3>
@@ -98,34 +147,18 @@ class InformacionUsuario extends Component {
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel>Departamento</CLabel>
-                    <CSelect custom name="departamento" id="department">
-                    <option value="Lima">Lima</option>
-                    <option value="Ica">Ica</option>
-                    <option value="Arequipa">Arequipa</option>
-                    <option value="Moquegua">Moquegua</option>
-                    <option value="Tacna">Tacna</option>
-                    <option value="6">Tumbes</option>
-                    <option value="7">Piura</option>
-                    <option value="8">La Libertad</option>
-                    <option value="9">Ayacucho</option>
-                    <option value="10">Junin</option>
-                    <option value="11">Lambayeque</option>
-                    <option value="12">Amazonas</option>
+                    <CSelect custom name="departamento" id="department" onChange={this.onchange} value={this.state.idDepartamento}>
+                    {this.state.departamento.map((departamento,index) => (
+                        <option key={index} value={departamento.idDepartamento}>{departamento.nombre}</option>
+                    ))}
                     </CSelect>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel>Provincia</CLabel>
-                    <CSelect custom name="provincia" id="provincia">
-                    <option value="1">Lima</option>
-                    <option value="2">Huaral</option>
-                    <option value="3">Barranca</option>
-                    <option value="4">Cajatambo</option>
-                    <option value="5">Canta</option>
-                    <option value="6">Cañete</option>
-                    <option value="7">Huarochirí</option>
-                    <option value="8">Huaura</option>
-                    <option value="9">Oyón</option>
-                    <option value="10">Yauyos</option>
+                    <CSelect custom name="provincia" id="provincia" onChange={this.onchange} value={this.state.usuario.idProvincia ? this.state.usuario.idProvincia.idProvincia : 0}>
+                    {provincia.map((provincia,index) => (
+                        <option key={index} value={provincia.idProvincia}>{provincia.nombre}</option>
+                    ))}
                     </CSelect>
                 </CFormGroup>
                 <CFormGroup>
@@ -137,7 +170,7 @@ class InformacionUsuario extends Component {
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Celular</CLabel>
-                    <CInput id="celular" placeholder="Ingrese su celular" required onChange={this.onchange} value={this.state.usuario.celular}/>
+                    <CInput id="celular" placeholder="Ingrese su celular" required onChange={this.onchange} value={this.state.usuario.telefono}/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Documento de identificación</CLabel>
@@ -148,7 +181,7 @@ class InformacionUsuario extends Component {
                         <option value="2">CE</option>
                         </CSelect>
                     </CInputGroupPrepend>
-                    <CInput type="text" id="username3" name="dni" value={this.state.usuario.dni} onChange={this.onchange}/>
+                    <CInput type="text" id="dni" name="dni" value={this.state.usuario.dni} onChange={this.onchange}/>
                   </CInputGroup>
                 </CFormGroup>
             </CCol>
@@ -156,15 +189,15 @@ class InformacionUsuario extends Component {
                 <h3>Medidas</h3>
                 <CFormGroup className="mt-3">
                     <CLabel type='number'>Cintura (cm)</CLabel>
-                    <CInput id="cintura" placeholder="Ingrese su medida de cintura" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idMedida.cintura : "" }/>
+                    <CInput id="cintura" placeholder="Ingrese su medida de cintura" required onChange={this.onchange} value={this.state.usuario.idMedida ? this.state.usuario.idMedida.cintura : "" }/>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Busto (cm)</CLabel>
-                    <CInput id="busto" placeholder="Ingrese su medida de busto" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idMedida.busto : "" }/>
+                    <CInput id="busto" placeholder="Ingrese su medida de busto" required onChange={this.onchange} value={this.state.usuario.idMedida ? this.state.usuario.idMedida.busto : "" }/>
                 </CFormGroup>
                 <CFormGroup className="mb-5">
                     <CLabel type='number'>Cadera (cm)</CLabel>
-                    <CInput id="cadera" placeholder="Ingrese su medida de cadera" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idMedida.cadera : "" }/>
+                    <CInput id="cadera" placeholder="Ingrese su medida de cadera" required onChange={this.onchange} value={this.state.usuario.idMedida ? this.state.usuario.idMedida.cadera : "" }/>
                 </CFormGroup>
                 <h3>Datos de Venta</h3>
                 <CFormGroup className="mt-4">
@@ -178,7 +211,7 @@ class InformacionUsuario extends Component {
                 <CFormGroup>
                   <CLabel>QR yape</CLabel>
                   <CCol>
-                    <CInputFile accept='image/*' custom id="yape"/>
+                    <CInputFile accept='image/*' custom id="yape" onChange={this.onchange}/>
                     <CLabel htmlFor="custom-file-input" variant="custom-file">
                       Elige archivo...
                     </CLabel>
@@ -187,7 +220,7 @@ class InformacionUsuario extends Component {
                 <CFormGroup>
                   <CLabel>QR plin</CLabel>
                   <CCol>
-                    <CInputFile accept='image/*' custom id="plin"/>
+                    <CInputFile accept='image/*' custom id="plin" onChange={this.onchange}/>
                     <CLabel htmlFor="custom-file-input" variant="custom-file">
                       Elige archivo...
                     </CLabel>
@@ -201,7 +234,7 @@ class InformacionUsuario extends Component {
         </CRow>
         <CRow className="mb-4">
             <CCol md="3" className="m-auto">
-                <CButton block color='primary'>
+                <CButton block color='primary' onClick={this.onSubmit}>
                     Actualizar
                 </CButton>
             </CCol>
@@ -214,13 +247,15 @@ class InformacionUsuario extends Component {
 const mapStateToProps = state => {
   return {
       buyer: state.comprador.buyers,
-      user: state.auth.user
+      user: state.auth.user,
+      provincia: state.provincia.cities.provincia,
+      departamento: state.provincia.cities.departamento
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-      ...bindActionCreators(Object.assign({},buyerActions), dispatch)
+      ...bindActionCreators(Object.assign({},buyerActions, authActions), dispatch)
   }
 }
 

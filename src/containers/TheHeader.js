@@ -23,6 +23,10 @@ import {
 import CIcon from '@coreui/icons-react'
 import { toggleSidebar as toggleSidebarAction } from '../services/redux/actions/changeState'
 import { login, logout } from '../services/redux/actions/auth';
+import { useHistory } from 'react-router-dom';
+import { createBuyer } from '../services/redux/actions/comprador';
+import Notification from 'src/views/pages/common/Notification';
+import notification from 'src/services/models/notificacion';
 
 // routes config
 import routes from '../routes/routes'
@@ -34,6 +38,7 @@ import {
 
 const TheHeader = () => {
   const dispatch = useDispatch()
+  const history = useHistory();
   const sidebarShow = useSelector(state => state.changeState.sidebarShow)
   const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
   const user = useSelector(state => state.auth.user);
@@ -41,6 +46,8 @@ const TheHeader = () => {
   const [clave, setClave] = React.useState('')
   const [error, setError] = React.useState(false)
   const [confirmacion, setConfirmacion] = React.useState(false)
+  const [registrarse, setRegistrarse] = React.useState(false)
+  const [createResults, setCreateResults] = React.useState([])
 
   const toggleSidebar = () => {
     const val = [true, 'responsive'].includes(sidebarShow) ? false : 'responsive'
@@ -50,6 +57,13 @@ const TheHeader = () => {
   const toggleSidebarMobile = () => {
     const val = [false, 'responsive'].includes(sidebarShow) ? true : 'responsive'
     dispatch(toggleSidebarAction(val))
+  }
+
+  const cambioModal = () => {
+    setConfirmacion(!confirmacion)
+    setRegistrarse(!registrarse)
+    setClave('')
+    setUsuario('')
   }
 
   const onChange = (key) => (e) => {
@@ -64,28 +78,45 @@ const TheHeader = () => {
         break;
     }
   }
-  const onSubmit = () => {
+  const onSubmit =  async () => {
     let user1 = { correo: usuario, clave: clave }   
-    dispatch(login(user1));
+    if(confirmacion) {
+      await dispatch(login(user1)) 
+      if(!isAuthenticated) setError(true)
+      else setError(false)
+    }
+    else {
+      let res = await dispatch(createBuyer(user1))
+      if(res.type === 'CREATE_BUYER') {
+        let newNotification = new notification('success', 'Registro exitoso', 'Usuario registrado correctamente')
+        setCreateResults([...createResults, newNotification])
+      }
+      setRegistrarse(false)
+      setError(false);
+    }
+    
   }
 
   useEffect(() => {
     if (isAuthenticated) {
       setConfirmacion(false);
     } else {
-      setError(true);
+      setError(false);
     }
   }, [isAuthenticated, user]);
 
   const loginAuth = () => {
     if(isAuthenticated){
       dispatch(logout());
+      history.push('/prendas');
     }
     else setConfirmacion(true)
   }
   
   return (
+    
     <>
+    
     <CHeader withSubheader>
       <CToggler
         inHeader
@@ -104,7 +135,7 @@ const TheHeader = () => {
       <CHeaderNav className="d-md-down-none mr-auto">
         
         <CHeaderNavItem  className="px-3">
-          <CHeaderNavLink to="/perfil">Usuario</CHeaderNavLink>
+          <CHeaderNavLink to="/perfil">{user ?  "Bienvenido " + (user.nombre ? user.nombre : "") : "Iniciar Sesión"}</CHeaderNavLink>
         </CHeaderNavItem>
         
       </CHeaderNav>
@@ -124,7 +155,7 @@ const TheHeader = () => {
       </CHeaderNav>
 
       <CHeaderNav className="px-3">
-        <TheHeaderDropdownMssg/>
+        {user ? <TheHeaderDropdownMssg user={user}/> : <></>}
         <TheHeaderDropdown loginAuth={loginAuth}/>
       </CHeaderNav>
 
@@ -139,29 +170,62 @@ const TheHeader = () => {
       show={confirmacion} 
       onClose={() => setConfirmacion(!confirmacion)}
       size="sm"
-  >
+    >
       <CModalHeader closeButton>
-      <CModalTitle>Login</CModalTitle>
+        <CModalTitle>Login</CModalTitle>
       </CModalHeader>
       <CModalBody>
-      <CForm>
-        <CFormGroup>
-            <CLabel type='text'>Usuario</CLabel>
-            <CInput id="user" placeholder="Ingrese su usuario" required onChange={onChange('usuario')} value={usuario}/>
-        </CFormGroup>
-        <CFormGroup>
-            <CLabel type='password'>Contraseña</CLabel>
-            <CInput id="password" placeholder="Ingrese su clave" required onChange={onChange('clave')} value={clave}/>
-        </CFormGroup>
-      </CForm>
-        {error && <p style={{color: 'red'}}>Usuario o contraseña incorrectos</p>}
+        <CForm>
+          <CFormGroup>
+              <CLabel>Correo</CLabel>
+              <CInput id="user" placeholder="Ingrese su correo" required onChange={onChange('usuario')} value={usuario}/>
+          </CFormGroup>
+          <CFormGroup>
+              <CLabel>Contraseña</CLabel>
+              <CInput type='password' id="password" placeholder="Ingrese su clave" required onChange={onChange('clave')} value={clave}/>
+          </CFormGroup>
+        </CForm>
+        {error && <p style={{color: 'red'}}>Correo o contraseña incorrectos</p>}
       </CModalBody>
       <CModalFooter>
-      <CButton color="primary" onClick={() => onSubmit()}>
-          Aceptar
-      </CButton>
+        <CButton  onClick={() => cambioModal()}>
+          Registrarse
+        </CButton>
+        <CButton color="primary" onClick={() => onSubmit()}>
+          Iniciar sesión
+        </CButton>
       </CModalFooter>
-  </CModal>
+    </CModal>
+    <CModal 
+      show={registrarse} 
+      onClose={() => setRegistrarse(!registrarse)}
+      size="sm"
+    >
+      <CModalHeader closeButton>
+        <CModalTitle>Registrarse</CModalTitle>
+      </CModalHeader>
+      <CModalBody>
+        <CForm>
+          <CFormGroup>
+              <CLabel>Correo</CLabel>
+              <CInput id="user1" placeholder="Ingrese su correo" required onChange={onChange('usuario')} value={usuario}/>
+          </CFormGroup>
+          <CFormGroup>
+              <CLabel>Contraseña</CLabel>
+              <CInput type='password' id="password1" placeholder="Ingrese su clave" required onChange={onChange('clave')} value={clave}/>
+          </CFormGroup>
+        </CForm>
+      </CModalBody>
+      <CModalFooter>
+        <CButton  onClick={() => cambioModal()}>
+          Ya tengo cuenta
+        </CButton>
+        <CButton color="primary" onClick={() => onSubmit()}>
+          Registrarse
+        </CButton>
+      </CModalFooter>
+    </CModal>
+    {createResults.length >= 1 ?  createResults.map((notification, index) => <Notification key={index} notif={notification} />) : <></>}
   </>
   )
 }

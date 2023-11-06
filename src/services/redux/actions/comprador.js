@@ -2,12 +2,14 @@ import {
     GET_BUYERS,
     CREATE_BUYER,
     UPDATE_BUYER,
-    ERROR_BUYER
+    ERROR_BUYER,
+    VALIDATE_RUC
 } from './actionTypes/comprador'
 import { 
     createBuyer as createBuyerAPI,
     getBuyers as getBuyersAPI,
     updateBuyer as updateBuyerAPI,
+    validateRuc as validateRucAPI
 } from '../../api/comprador-api'
 
 import ResponseModel from '../../models/ResponseModel'
@@ -42,7 +44,6 @@ const createBuyer = (buyer) => async (dispatch) => {
         
         res = await createBuyerAPI(buyer);
         buyer.id = res.response;
-
         if(!res.error && res.status >= 200 && res.status <= 300){
             return dispatch({
                 type: CREATE_BUYER,
@@ -84,4 +85,22 @@ const updateBuyer = (buyer) => async (dispatch) => {
     })
 }
 
-export { getBuyers, createBuyer, updateBuyer }
+const validateRuc = (buyer) => async (dispatch) => {
+    let res = new ResponseModel();
+    try {
+        res = await validateRucAPI(buyer);
+        if(!res.error && res.status >= 200 && res.status <= 300){
+            return dispatch({
+                type: VALIDATE_RUC,
+                payload: buyer.idVendedor
+            })
+        }
+    } catch(e){
+        console.log(e);
+        console.log('ERROR! '+VALIDATE_RUC);
+        console.log(res.status);
+        console.log(res.error);
+    }
+}
+
+export { getBuyers, createBuyer, updateBuyer, validateRuc }

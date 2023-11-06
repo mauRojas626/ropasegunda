@@ -20,4 +20,12 @@ const deleteClothes = async (id) => {
     return await apiDelete(`clothes/delete/`+id);
 }
 
-export { getClothes, createClothes, updateClothes, deleteClothes } 
+const blockClothes = async (id) => {
+    return await apiGet(`clothes/block/`+id);
+}
+
+const unBlockClothes = async (id) => {
+    return await apiGet(`clothes/unblock/`+id);
+}
+
+export { getClothes, createClothes, updateClothes, deleteClothes, blockClothes, unBlockClothes } 

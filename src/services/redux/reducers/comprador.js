@@ -2,7 +2,8 @@ import {
     CREATE_BUYER,
     UPDATE_BUYER,
     GET_BUYERS,
-    ERROR_BUYER
+    ERROR_BUYER,
+    VALIDATE_RUC
 } from '../actions/actionTypes/comprador'
 
 const initialState = {
@@ -19,6 +20,8 @@ const buyer = (state = initialState, action) => {
             return {...state, buyers: [...state.buyers, action.playload], failed: false};
         case UPDATE_BUYER:
             return {...state, buyers: state.buyers.map(buyer => buyer.id === action.playload.id ? {...buyer, nombre: action.playload.nombre, apellido: action.playload.apellido, correo: action.playload.correo, clave: action.playload.clave, telefono: action.playload.telefono, bloqueado: action.playload.bloqueado, reportado: action.playload.reportado, dni: action.playload.dni, genero: action.playload.genero, direccion: action.playload.direccion, idMedida: action.playload.idMedida, idProvincia: action.playload.idProvincia} : buyer), failed: false};
+        case VALIDATE_RUC:
+            return {...state, buyers: state.buyers.map(buyer => buyer.idUsuario === action.payload.idUsuario ? {...buyer, idVendedor: {...buyer.idVendedor, aprobado: action.payload.aprobado}} : buyer), failed: false};
         case ERROR_BUYER:            
             return {...state, isLoading: false, failed: true};
         default:

@@ -1,18 +1,22 @@
 import React, { Component } from 'react'
-import { CButton, CCol, CImg, CRow, CSwitch, CCard, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle } from '@coreui/react';
+import { CButton, CCol, CImg, CRow, CSwitch, CCard, CModal, CModalBody, CModalFooter, CModalHeader, CModalTitle, CCardBody } from '@coreui/react';
 import FileUpload from 'src/views/dropzone/FileUpload';
 import PrendasCardHorizontal from './PrendaCardHorizontal';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as sellActions from '../../../services/redux/actions/venta'
-import { Link } from 'react-router-dom/cjs/react-router-dom.min';
+import * as clothesActions from '../../../services/redux/actions/prenda'
+import { Link } from 'react-router-dom';
 
 class Pago extends Component {
     constructor(props){
         super(props);
         this.state = {
             showQrYape: true,
-            photo: false
+            photo: false,
+            time: 600,
+            modal: false,
+            modal2: false,
         }
     }
 
@@ -24,13 +28,44 @@ class Pago extends Component {
         this.setState({photo: photo})
     }
 
-    onSubmit = () => {
+    async componentDidMount() {
+        this.countdown = setInterval(async () => {
+          if (this.state.time > 0) {
+            this.setState((prevState) => ({ time: prevState.time - 1 }));
+          } else {
+            clearInterval(this.countdown);
+            this.setState({modal2: !this.state.modal2})
+            await this.props.unBlockCothes(this.props.location.state.prenda.idPrenda)
+          }
+        }, 1000);
+    }
+
+    async componentWillUnmount() {
+        clearInterval(this.countdown);
+        await this.props.unBlockCothes(this.props.location.state.prenda.idPrenda)
+    }
+
+    onSubmit = async () => {
         const formData = new FormData();
         const newFileName = `${Date.now()}_${this.state.photo.name}`
         formData.append('files', this.state.photo, newFileName)
-        const venta = { total: this.props.location.state.prenda.precio, idComprador: this.props.user.idUsuario, idVendedor: this.props.location.state.prenda.idVendedor.idUsuario, idPrenda: this.props.location.state.prenda.idPrenda}
-        formData.append('venta', JSON.stringify(venta));
-        this.props.createSell(formData)
+        if(this.props.location.state.prenda !== undefined){
+            const venta = { total: this.props.location.state.prenda.precio, idComprador: this.props.user.idUsuario, idVendedor: this.props.location.state.prenda.idVendedor.idUsuario, idPrenda: this.props.location.state.prenda.idPrenda}
+            formData.append('venta', JSON.stringify(venta));
+            await this.props.createSell(formData)
+        }
+        else {
+            const venta = this.props.location.state.sell
+            formData.append('venta', JSON.stringify(venta));
+            await this.props.payShip(formData)
+        }
+        this.setState({modal: !this.state.modal})
+    }
+
+    formatTimeRemaining(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
     }
 
     render() {
@@ -41,11 +76,32 @@ class Pago extends Component {
             <CCol xs="12" sm="12" className="m-auto">
                 <CRow>
                     <CCol xs="12" sm="12" className="m-auto">
-                        <CCard>
+                    <CCard>
+                        <CCardBody>
+                            <CCol className='m-auto'>
+                                <h4>Tiempo para culminar la transacción: {this.formatTimeRemaining(this.state.time)}</h4>
+                            </CCol>
+                        </CCardBody>
+                    </CCard>
+                    {this.props.location.state.prenda ? <CCard>
                             <PrendasCardHorizontal prenda={this.props.location.state.prenda} modo="enviar"></PrendasCardHorizontal>
                         </CCard>
+                    : <CCard>
+                        <CCardBody>
+                            <CCol>
+                                <span><strong>Vendedor:</strong> {this.props.location.state.sell[0].idVendedor.nombre + " " + this.props.location.state.sell[0].idVendedor.apellido}</span>
+                                <br/>
+                                <span><strong>Dirección:</strong> {this.props.location.state.sell[0].idEnvio.direccion}</span>
+                                <br/>
+                                <span><strong>Precio Envio:</strong> S/ {this.props.location.state.sell[0].idEnvio.precioEnvio}</span>
+                                <br/>
+                                <span><strong>Número de Prendas: </strong>{this.props.location.state.sell.length}</span>
+                            </CCol> 
+                        </CCardBody>
+                        
+                    </CCard>}
                     </CCol>
-                </CRow>
+                </CRow> 
                 <CRow className="mt-5">
                     <CCol xs="12" sm="4" className="m-auto">
                         <h4 style={{"textAlign": "center"}}>1</h4>
@@ -84,7 +140,7 @@ class Pago extends Component {
                             </CCol>  
                         </CRow>
                         <CRow className="m-3" md="10">
-                            Recuerda que el pago es únicamente por la prenda y no por el envío. El envío será cotizado después de confirmar el pago
+                            {this.props.location.state.prenda ? "Recuerda que el pago es únicamente por la prenda y no por el envío. El envío será cotizado después de confirmar el pago": ""}
                         </CRow>
                     </CCol>
                     <CCol xs="12" sm="4" className="m-auto">
@@ -103,18 +159,35 @@ class Pago extends Component {
                 onClose={() => this.setState({modal: !this.state.modal})}
                 size="sm"
             >
-            <CModalHeader closeButton>
-            <CModalTitle>Compra Exitosa</CModalTitle>
-            </CModalHeader>
-            <CModalBody>
-                Su compra fue realizada de manera exitosa. Puede ver el estado de su compra en la sección de ropa comprada
-            </CModalBody>
-            <CModalFooter>
-            <Link to="/comprados">
-                <CButton color="primary" onClick={() => this.setState({validarPago: !this.state.validarPago})}>Confirmar Pago</CButton>
-            </Link>
-            </CModalFooter>
-        </CModal>
+                <CModalHeader>
+                <CModalTitle>Compra Exitosa</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    Su pago fue realizado de manera exitosa. Puede ver el estado de su compra en la sección de ropa comprada
+                </CModalBody>
+                <CModalFooter>
+                <Link to="/comprados">
+                    <CButton color="primary" onClick={() => this.setState({modal: !this.state.modal})}>Aceptar</CButton>
+                </Link>
+                </CModalFooter>
+            </CModal>
+            <CModal 
+                show={this.state.modal2} 
+                onClose={() => this.setState({modal2: !this.state.modal2})}
+                size="sm"
+            >
+                <CModalHeader>
+                <CModalTitle>Tiempo agotado</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    Se agotó el tiempo de espera para la realización del pago. Por favor vuelva a intentarlo
+                </CModalBody>
+                <CModalFooter>
+                <Link to="/prendas">
+                    <CButton color="primary" onClick={() => this.setState({modal2: !this.state.modal2})}>Aceptar</CButton>
+                </Link>
+                </CModalFooter>
+            </CModal>
         </>
         )
     }
@@ -128,7 +201,7 @@ const mapStateToProps = state => {
   
   const mapDispatchToProps = dispatch => {
     return {
-        ...bindActionCreators(Object.assign({},sellActions), dispatch)
+        ...bindActionCreators(Object.assign({},sellActions, clothesActions), dispatch)
     }
   }
   

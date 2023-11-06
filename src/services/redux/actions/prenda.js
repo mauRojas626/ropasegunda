@@ -3,13 +3,15 @@ import {
     CREATE_CLOTHES,
     UPDATE_CLOTHES,
     ERROR_CLOTHES,
-    DELETE_CLOTHES
+    DELETE_CLOTHES,
+    BLOCK_CLOTHES
 } from './actionTypes/prenda'
 import { 
     createClothes as createClothesAPI,
     getClothes as getClothesAPI,
     updateClothes as updateClothesAPI,
-    deleteClothes as deleteClothesAPI
+    deleteClothes as deleteClothesAPI,
+    blockClothes as blockClothesAPI
 } from '../../api/prenda-api'
 
 import ResponseModel from '../../models/ResponseModel'
@@ -109,4 +111,58 @@ const deleteClothes = (id) => async (dispatch) => {
     })
 }
 
-export { getClothes, createClothes, updateClothes, deleteClothes }
+const blockClothes = (id) => async (dispatch) => {
+    let res = new ResponseModel();
+    try{
+        res = await blockClothesAPI(id);
+        
+        if(!res.error && res.status >= 200 && res.status <= 300){
+            if(res.status === 200)
+                return dispatch({
+                    type: BLOCK_CLOTHES,
+                    playload: id
+                })
+            else {
+                return dispatch({
+                    type: "ALREADY_BUY_CLOTHES",
+                    playload: id
+                })
+            }
+        }
+    } catch(e){
+        console.log(e);
+        console.log('ERROR! '+BLOCK_CLOTHES);
+        console.log(res.status);
+        console.log(res.error);
+    }
+    return dispatch({
+        type: ERROR_CLOTHES,
+        playload: false
+    })
+}
+
+const unBlockClothes = (id) => async (dispatch) => {
+    let res = new ResponseModel();
+    try{
+        res = await blockClothesAPI(id);
+        
+        if(!res.error && res.status >= 200 && res.status <= 300){
+            return dispatch({
+                type: "UNBLOCK_CLOTHES",
+                playload: id
+            })
+        }
+    } catch(e){
+        console.log(e);
+        console.log('ERROR! '+BLOCK_CLOTHES);
+        console.log(res.status);
+        console.log(res.error);
+    }
+    return dispatch({
+        type: ERROR_CLOTHES,
+        playload: false
+    })
+
+}
+
+export { getClothes, createClothes, updateClothes, deleteClothes, blockClothes, unBlockClothes }

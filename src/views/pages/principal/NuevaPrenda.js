@@ -27,7 +27,7 @@ class NuevaPrenda extends Component {
     componentDidMount(){
         if(this.props.location.state){
             this.setState({clothes: this.props.location.state.prenda, sexo: this.props.location.state.prenda.sexo, categoria: this.props.location.state.prenda.categoria,
-            files: this.props.location.state.prenda.fotos, oldFiles: this.props.location.state.prenda.fotos})
+            files: this.props.location.state.prenda.fotos, oldFiles: this.props.location.state.prenda.fotos, size: this.props.location.state.prenda.idMedida})
         }
     }
     
@@ -41,11 +41,11 @@ class NuevaPrenda extends Component {
         this.setState({clothes: updatedClothes});
     }
 
-    onChangeMedida = (key, isNumeric = false, isDate = false) => (e) => {
+    onChangeMedida = (key, isNumeric = false) => (e) => {
         const { size } = this.state;
         const { value } = e.target;
 
-        const val = isNumeric ? parseInt(value || '0') : isDate ? e.target.value : e.target.value;
+        const val = isNumeric ? parseInt(value || '0') : e.target.value;
         let updatedClothes = { ...size };
         updatedClothes[key] = val;
         this.setState({size: updatedClothes});
@@ -134,7 +134,7 @@ class NuevaPrenda extends Component {
                                     cintura (cm)
                                 </CInputGroupText>
                             </CInputGroupPrepend>
-                            <CInput id="cintura" name="cintura" placeholder="cm" onChange={this.onChangeMedida('cintura')} value={this.state.clothes.idMedida? this.state.clothes.idMedida.cintura : null}/>
+                            <CInput id="cintura" name="cintura" placeholder="cm" onChange={this.onChangeMedida('cintura')} value={this.state.size.cintura}/>
                         </CInputGroup>
                         <CInputGroup className="m-2">
                             <CInputGroupPrepend>
@@ -142,7 +142,7 @@ class NuevaPrenda extends Component {
                                     busto (cm)
                                 </CInputGroupText>
                             </CInputGroupPrepend>
-                            <CInput id="busto" name="busto" placeholder="cm" onChange={this.onChangeMedida('busto')} value={this.state.clothes.idMedida? this.state.clothes.idMedida.busto : null}/>
+                            <CInput id="busto" name="busto" placeholder="cm" onChange={this.onChangeMedida('busto')} value={this.state.size.busto}/>
                         </CInputGroup>
                         <CInputGroup className="m-2">
                             <CInputGroupPrepend>
@@ -150,7 +150,7 @@ class NuevaPrenda extends Component {
                                     cadera (cm)
                                 </CInputGroupText>
                             </CInputGroupPrepend>
-                            <CInput id="cadera" name="cadera" placeholder="cm" onChange={this.onChangeMedida('cadera')} value={this.state.clothes.idMedida? this.state.clothes.idMedida.cadera : null}/>
+                            <CInput id="cadera" name="cadera" placeholder="cm" onChange={this.onChangeMedida('cadera')} value={this.state.size.cadera}/>
                         </CInputGroup>
                         <CInputGroup className="m-2">
                             <CInputGroupPrepend>
@@ -158,7 +158,7 @@ class NuevaPrenda extends Component {
                                     largo (cm)
                                 </CInputGroupText>
                             </CInputGroupPrepend>
-                            <CInput id="largo" name="largo" placeholder="cm" onChange={this.onChangeMedida('largoTotal')} value={this.state.clothes.idMedida? this.state.clothes.idMedida.largoTotal : null}/>
+                            <CInput id="largo" name="largo" placeholder="cm" onChange={this.onChangeMedida('largoTotal')} value={this.state.size.largoTotal}/>
                         </CInputGroup>
                         <CInputGroup className="m-2">
                             <CInputGroupPrepend>
@@ -166,7 +166,7 @@ class NuevaPrenda extends Component {
                                     largo mangas (cm)
                                 </CInputGroupText>
                             </CInputGroupPrepend>
-                            <CInput id="mangas" name="margas" placeholder="cm" onChange={this.onChangeMedida('largoMangas')} value={this.state.clothes.idMedida? this.state.clothes.idMedida.largoManga : null}/>
+                            <CInput id="mangas" name="margas" placeholder="cm" onChange={this.onChangeMedida('largoMangas')} value={this.state.size.largoManga}/>
                         </CInputGroup>
                         <CInputGroup className="m-2">
                             <CInputGroupPrepend>
@@ -174,7 +174,7 @@ class NuevaPrenda extends Component {
                                     hombro a hombro (cm)
                                 </CInputGroupText>
                             </CInputGroupPrepend>
-                            <CInput id="hombro" name="hombro" placeholder="cm" onChange={this.onChangeMedida('hombros')} value={this.state.clothes.idMedida? this.state.clothes.idMedida.hombros : null}/>
+                            <CInput id="hombro" name="hombro" placeholder="cm" onChange={this.onChangeMedida('hombros')} value={this.state.size.hombros}/>
                         </CInputGroup>
                     </CCol>
                 </CCol>

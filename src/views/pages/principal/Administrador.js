@@ -4,6 +4,8 @@ import CIcon from '@coreui/icons-react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as buyerActions from '../../../services/redux/actions/comprador'
+import notification from 'src/services/models/notificacion';
+import Notification from '../common/Notification';
 
 class Administrador extends Component {
   constructor(props){
@@ -12,17 +14,30 @@ class Administrador extends Component {
         collapse: 0,
         isLoading: true,
         failed: false,
-        usuarios: []
+        usuarios: [],
+        createResults: [],
     }
   }
   async componentDidMount(){
     await this.props.getBuyers();
-    this.setState({usuarios: this.props.buyer})
+    this.setState({usuarios: this.props.buyer.filter(item => item.idVendedor !== undefined && item.idVendedor.aprobado === 0)})
+  }
 
+  onAccept = async (usuario) => {
+    usuario.idVendedor.aprobado = 1;
+    console.log(usuario)
+    let res = await this.props.validateRuc(usuario);
+    if(res.type === 'VALIDATE_RUC'){
+      this.setState({usuarios: this.state.usuarios.filter(item => item.idVendedor.RUC !== usuario.idVendedor.RUC)})
+      let notificacion = new notification('success', 'Aprobación exitosa', 'RUC aprobado correctamente');
+      this.setState({createResults: [...this.state.createResults, notificacion]})
+    }
   }
 
   render() {
     return (
+      <>
+      {this.state.createResults.map((notificacion, index) => <Notification key={index} notif={notificacion}></Notification>)}
       <CCol xs="12" md="11" className="m-3">
         <h3>Validar RUC</h3>
         {this.state.usuarios.map((usuario,index) => <CCard className="mb-4" key={index}>
@@ -30,13 +45,13 @@ class Administrador extends Component {
                 <CRow>
                     <CCol md="10">
                       <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
-                          <span>Nombre: {usuario.nombre}</span>    
+                          <span>Nombre: {usuario.nombre + " " + usuario.apellido}</span>    
                           <span>DNI: {usuario.dni}</span> 
-                          <span>RUC: {1000000000 + usuario.dni + index+13}</span>
+                          <span>RUC: {usuario.idVendedor.RUC}</span>
                       </CRow>
                     </CCol>
                     <CCol md="2">
-                        <CButton color='primary' size='sm' onClick={() => this.setState({calificar: true})}>
+                        <CButton color='primary' size='sm' onClick={() => this.onAccept(usuario)}>
                             <CIcon name='cil-check'></CIcon>
                         </CButton>{'  '}
                         <CButton color='danger' size='sm' onClick={() => this.setState({calificar: true})}>
@@ -103,7 +118,8 @@ class Administrador extends Component {
                 </CCardBody>
             </CCollapse>
         </CCard>
-</CCol>
+      </CCol>
+      </>
     )
   }
 }

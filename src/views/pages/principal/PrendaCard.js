@@ -14,7 +14,7 @@ export default class PrendaCard extends Component {
     return (
             <Link className="link" to={{pathname: "./Prenda", state: {prenda: this.props.prenda}}}  >              
                 <CCard>
-                    <CCardImg orientation="top" src={/*this.props.prenda.fotos[0].url*/''} />
+                    <CCardImg orientation="top" src={this.props.prenda.fotos[0].url} />
                     <CCardBody>
                         <CCol>
                         <span style={{float: "right"}}> <CIcon name="cil-star"/>{" " + this.props.prenda.rating.toFixed(1)}</span>

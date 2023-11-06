@@ -9,7 +9,9 @@ const createBuyer = async (buyer) => {
 }
 
 const updateBuyer = async (buyer) => {
-    return await apiPost(`buyers/edit`, buyer);
+    return await apiPost(`buyers/edit`, buyer, {
+        'Content-Type': 'multipart/form-data',
+    });
 }
 
 const deleteBuyer = async (id) => {
@@ -20,4 +22,8 @@ const validateBuyer = async (buyer) => {
     return await apiPost(`buyers/validate`, buyer);
 }
 
-export { getBuyers, createBuyer, updateBuyer, deleteBuyer, validateBuyer } 
+const validateRuc = async (buyer) => {
+    return await apiPost(`buyers/validateRuc`, buyer);
+}
+
+export { getBuyers, createBuyer, updateBuyer, deleteBuyer, validateBuyer, validateRuc } 

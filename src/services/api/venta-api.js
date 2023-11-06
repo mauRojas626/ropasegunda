@@ -20,4 +20,36 @@ const deleteSell = async (id) => {
     return await apiDelete(`sell/delete/`+id);
 }
 
-export { getSell, createSell, updateSell, deleteSell } 
+const validateSell = async (sell) => {
+    return await apiPost(`sell/validate`, sell, {
+        'Content-Type': 'multipart/form-data',
+    });
+}
+
+const requestShipping = async (sell) => {
+    return await apiPost(`sell/requestShip`, sell);
+}
+
+const priceShiping = async (sell) => {
+    return await apiPost(`sell/cotizarEnvio`, sell);
+}
+
+const payShip = async (sell) => {
+    return await apiPost(`sell/payEnvio`, sell, {
+        'Content-Type': 'multipart/form-data',
+    });
+}
+
+const validateShip = async (sell) => {
+    return await apiPost(`sell/validateShip`, sell);
+}
+
+const enviar = async (sell) => {
+    return await apiPost(`sell/enviar`, sell);
+}
+
+const calificar = async (sell) => {
+    return await apiPost(`sell/calificar`, sell);
+}
+
+export { getSell, createSell, updateSell, deleteSell, validateSell, requestShipping, priceShiping, payShip, validateShip, enviar, calificar } 
