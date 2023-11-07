@@ -1,4 +1,4 @@
-import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton, CInput, CCollapse, CInputCheckbox, CLabel, CFormGroup } from '@coreui/react';
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton, CInput, CCollapse, CInputCheckbox, CLabel, CFormGroup, CInputRadio } from '@coreui/react';
 import React, { Component } from 'react'
 import PrendaCard from './PrendaCard';
 import CIcon from '@coreui/icons-react';
@@ -13,8 +13,8 @@ class Prendas extends Component {
             collapse: 0,
             clothes: [],
             url: '',
-            categorias: [],
-            tallas: [],
+            categoria: "todos",
+            talla: "todos",
             allSize: [],
             allCat: [],
             precioMin: 0,
@@ -51,32 +51,8 @@ class Prendas extends Component {
         
     }
 
-    onChangeCat = (e) => {
-        const {categorias} = this.state
-        if(categorias.includes(e)){
-            this.setState({
-                categorias: categorias.filter(item => item !== e)
-            })
-        }
-        else{
-            this.setState({
-                categorias:[ ...categorias, e]
-            })
-        }
-    }
-
     onChangeLabel = (e) => {
-        const {tallas} = this.state
-        if(tallas.includes(e.target.value)){
-            this.setState({
-                tallas: tallas.filter(item => item !== e.target.value)
-            })
-        }
-        else{
-            this.setState({
-                tallas:[ ...tallas, e.target.value]
-            })
-        }
+        this.setState({talla: e.target.value})
     }
 
     onChangePrice = (e) => {
@@ -138,11 +114,10 @@ class Prendas extends Component {
 
     render() {
         const {clothes} = this.state
-        const clothesFilter = clothes.filter(item =>
-            this.state.categorias.length === 0 || (this.state.categorias.includes(item.categoria) && item.precio >= this.state.precioMin && 
+        const clothesFilter = clothes.filter(item => ((this.state.categoria === item.categoria || this.state.categoria === "todos") && item.precio >= this.state.precioMin && 
             item.precio <= this.state.precioMax && item.idMedida.busto >= this.state.bustoMin && item.idMedida.busto <= this.state.bustoMax && 
             item.idMedida.cadera >= this.state.caderaMin && item.idMedida.cadera <= this.state.caderaMax && item.idMedida.cintura >= this.state.cinturaMin 
-            && item.idMedida.cintura <= this.state.cinturaMax && this.state.sexo.includes(item.sexo) && this.state.tallas.includes(item.talla)
+            && item.idMedida.cintura <= this.state.cinturaMax && this.state.sexo.includes(item.sexo) && (this.state.talla === item.talla || this.state.talla === "todos")
             && item.rating >= this.state.califMin && item.rating <= this.state.califMax)
           )
         return (
@@ -151,7 +126,7 @@ class Prendas extends Component {
                     <CCard>
                         <CCardHeader>
                             <strong>Filtros</strong>
-                            {this.props.user ? <CButton className="float-right m-0 p-0" onClick={this.filter} >activar mis filtros</CButton> : null}
+                            {this.props.user ? <CButton className="float-right m-0 p-0" onClick={this.filter} >usar mis medidas</CButton> : null}
                         </CCardHeader>
                         <CCardBody className="p-0">
                             <CCard className="mb-0">
@@ -169,10 +144,14 @@ class Prendas extends Component {
                                     <CCardBody>
                                         <CRow className="g-0">
                                             <CCol className="m-0">
+                                                <CFormGroup variant="custom-radio" className="checkbox" key="0">
+                                                    <CInputRadio id={0} name={"todos"} value={"todos"} checked={this.state.categoria === "todos"} onChange={()=>this.setState({categoria: "todos"})} />
+                                                    <CLabel variant="custom-radio" htmlFor={0}>Todos</CLabel>
+                                                </CFormGroup>
                                                 {this.state.allCat.map((item, index) =>
-                                                    <CFormGroup variant="checkbox" className="checkbox" key={index}>
-                                                        <CInputCheckbox id={index} name={index} value={item} checked={this.state.categorias.includes(item)} onChange={()=>this.onChangeCat(item)} />
-                                                        <CLabel variant="checkbox" className="form-check-label" htmlFor={index}>{item}</CLabel>
+                                                    <CFormGroup variant="custom-radio" className="checkbox" key={index}>
+                                                        <CInputRadio id={index} name={index} value={item} checked={this.state.categoria === item} onChange={()=>this.setState({categoria: item})} />
+                                                        <CLabel variant="custom-radio" htmlFor={index}>{item}</CLabel>
                                                     </CFormGroup>
                                                 )}
                                             </CCol>
@@ -286,10 +265,14 @@ class Prendas extends Component {
                                     <CCardBody>
                                         <CRow className="g-0 inline ">
                                             <CCol>
+                                                <CFormGroup variant="custom-radio">
+                                                    <CInputRadio id={0} name={0} value={"todos"} checked={this.state.talla === "todos"} onChange={this.onChangeLabel} />
+                                                    <CLabel variant="custom-radio" htmlFor={0}>Todos</CLabel>
+                                                </CFormGroup>
                                                 {this.state.allSize.map((talla, index) =>
-                                                    <CFormGroup variant="checkbox" className="checkbox" key={index}>
-                                                        <CInputCheckbox id={index} name={index} value={talla} checked={this.state.tallas.includes(talla)} onChange={this.onChangeLabel} />
-                                                        <CLabel variant="checkbox" className="form-check-label" htmlFor={index}>{talla}</CLabel>
+                                                    <CFormGroup variant="custom-radio" key={index}>
+                                                        <CInputRadio id={index} name={index} value={talla} checked={this.state.talla === talla} onChange={this.onChangeLabel} />
+                                                        <CLabel variant="custom-radio" htmlFor={index}>{talla}</CLabel>
                                                     </CFormGroup>
                                                 )}
                                                 

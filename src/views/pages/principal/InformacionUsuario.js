@@ -22,6 +22,7 @@ class InformacionUsuario extends Component {
         yape: "",
         plin: "",
         createResults: [],
+        error: []
     }
   }
   
@@ -35,22 +36,76 @@ class InformacionUsuario extends Component {
   }
 
   onSubmit = async () => {
-    const formData = new FormData();
-    if(this.state.yape !== ""){
-      const newFileName = `${Date.now()}_${this.state.yape.name}`
-      formData.append('yape', this.state.yape, newFileName)
+    //validar
+    let pattern = /^[A-Za-z]+$/;
+    let error = []
+    if(this.state.usuario.nombre !== null && !pattern.test(this.state.usuario.nombre)){
+      error.nombre = "El nombre solo puede contener letras"
     }
-    if(this.state.plin !== ""){
-      const newFileName = `${Date.now()}_${this.state.plin.name}`
-      formData.append('plin', this.state.plin, newFileName)
+    if(this.state.usuario.apellido !== null && !pattern.test(this.state.usuario.apellido)){
+      error.apellido = "El apellido solo puede contener letras"
     }
-    formData.append('user', JSON.stringify(this.state.usuario));
-    let res = await this.props.updateBuyer(formData)
-    if(res.type === "UPDATE_BUYER"){
-      let newNotification = new notification('success', 'Actualización exitoso', 'Usuario actualizado correctamente')
-      this.setState({createResults: [...this.state.createResults, newNotification]})
-      this.props.updateUser(this.state.usuario)
-      this.setState({usuario: this.props.user})
+    pattern = /^\d{8}$/
+    if(this.state.usuario.dni !== null && !pattern.test(this.state.usuario.dni)){
+      error.dni = "El DNI debe contener 8 dígitos"
+    }
+    pattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i
+    if(this.state.usuario.correo !== null && !pattern.test(this.state.usuario.correo)){
+      error.correo = "El correo no es válido"
+    }
+    pattern = /^\d{9}$/
+    if(this.state.usuario.telefono !== null && !pattern.test(this.state.usuario.telefono)){
+      error.telefono = "El celular debe contener 9 dígitos"
+    }
+    if(this.state.usuario.idMedida !== 0){
+      if(!isNaN(parseInt(this.state.usuario.idMedida.cintura))){
+        error.cintura = "La cintura debe ser un número"
+      }
+      if(!isNaN(parseInt(this.state.usuario.idMedida.busto))){
+        error.busto = "El busto debe ser un número"
+      }
+      if(!isNaN(parseInt(this.state.usuario.idMedida.cadera))){
+        error.cadera = "La cadera debe ser un número"
+      }
+    }
+    if(this.state.usuario.idVendedor !== 0){
+      pattern = /^\d{11}$/
+      if(!pattern.test(this.state.usuario.idVendedor.ruc)){
+        error.ruc = "El RUC debe contener 11 dígitos"
+      }
+      if(this.state.usuario.idVendedor.delivery === null){
+        error.delivery = "Ingrese su empresa de delivery a domicilio"
+      }
+      if(this.state.usuario.idVendedor.agencia === null){
+        error.agencia = "Ingrese su empresa de delivery en agencia"
+      }
+      if(this.state.yape === ""){
+        error.yape = "Ingrese su QR de yape"
+      }
+      if(this.state.plin === ""){
+        error.plin = "Ingrese su QR de plin"
+      }
+    }
+    this.setState({error: error})
+    if(error.length === 0){
+      const formData = new FormData();
+      if(this.state.yape !== ""){
+        const newFileName = `${Date.now()}_${this.state.yape.name}`
+        formData.append('yape', this.state.yape, newFileName)
+      }
+      if(this.state.plin !== ""){
+        const newFileName = `${Date.now()}_${this.state.plin.name}`
+        formData.append('plin', this.state.plin, newFileName)
+      }
+      formData.append('user', JSON.stringify(this.state.usuario));
+      let res = await this.props.updateBuyer(formData)
+      if(res.type === "UPDATE_BUYER"){
+        let newNotification = new notification('success', 'Actualización exitoso', 'Usuario actualizado correctamente')
+        this.setState({createResults: [...this.state.createResults, newNotification]})
+        this.props.updateUser(this.state.usuario)
+        this.setState({usuario: this.props.user})
+        this.setState({error: error})
+      }
     }
   }
 
@@ -127,14 +182,17 @@ class InformacionUsuario extends Component {
                 <CFormGroup className="mt-4">
                     <CLabel htmlFor="name">Nombre</CLabel>
                     <CInput id="nombre" placeholder="Ingrese su nombre" required onChange={this.onchange} value={this.state.usuario.nombre}/>
+                    <p className="text-danger">{this.state.error.nombre}</p>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="lastname">Apellido</CLabel>
                     <CInput id="apellido" placeholder="Ingrese su apellido" required onChange={this.onchange} value={this.state.usuario.apellido}/>
+                    <p className="text-danger">{this.state.error.apellido}</p>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="email">Correo Electrónico</CLabel>
                     <CInput id="email" placeholder="Ingrese su correo" required onChange={this.onchange} value={this.state.usuario.correo}/>
+                    <p className="text-danger">{this.state.error.correo}</p>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel htmlFor="address">Dirección</CLabel>
@@ -166,10 +224,12 @@ class InformacionUsuario extends Component {
                 <CFormGroup>
                     <CLabel type='number'>Celular</CLabel>
                     <CInput id="celular" placeholder="Ingrese su celular" required onChange={this.onchange} value={this.state.usuario.telefono}/>
+                    <p className="text-danger">{this.state.error.telefono}</p>
                 </CFormGroup>
                 <CFormGroup>
-                    <CLabel type='number'>Documento de identificación</CLabel>
+                    <CLabel type='number'>DNI</CLabel>
                     <CInput type="text" id="dni" name="dni" value={this.state.usuario.dni} onChange={this.onchange}/>
+                    <p className="text-danger">{this.state.error.dni}</p>
                 </CFormGroup>
             </CCol>
             <CCol md="6" className="mb-4">
@@ -177,31 +237,37 @@ class InformacionUsuario extends Component {
                 <CFormGroup className="mt-3">
                     <CLabel type='number'>Cintura (cm)</CLabel>
                     <CInput id="cintura" placeholder="Ingrese su medida de cintura" required onChange={this.onchange} value={this.state.usuario.idMedida ? this.state.usuario.idMedida.cintura : "" }/>
+                    <p className="text-danger">{this.state.error.cintura}</p>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='number'>Busto (cm)</CLabel>
                     <CInput id="busto" placeholder="Ingrese su medida de busto" required onChange={this.onchange} value={this.state.usuario.idMedida ? this.state.usuario.idMedida.busto : "" }/>
+                    <p className="text-danger">{this.state.error.busto}</p>
                 </CFormGroup>
                 <CFormGroup className="mb-5">
                     <CLabel type='number'>Cadera (cm)</CLabel>
                     <CInput id="cadera" placeholder="Ingrese su medida de cadera" required onChange={this.onchange} value={this.state.usuario.idMedida ? this.state.usuario.idMedida.cadera : "" }/>
+                    <p className="text-danger">{this.state.error.cadera}</p>
                 </CFormGroup>
                 <h3>Datos de Venta</h3>
                 <CFormGroup className="mt-4">
                     <CLabel type='text'>Empresa de delivery a domicilio utilizada</CLabel>
                     <CInput id="delivery" placeholder="Ingrese su empresa de delivery a domicilio" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idVendedor.delivery : "" }/>
+                    <p className="text-danger">{this.state.error.delivery}</p>
                 </CFormGroup>
                 <CFormGroup>
                     <CLabel type='text'>Empresa de delivery con recojo en agencia utilizada</CLabel>
                     <CInput id="agencia" placeholder="Ingrese su empresa de delivery en agencia" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idVendedor.agencia : "" }/>
+                    <p className="text-danger">{this.state.error.agencia}</p>
                 </CFormGroup>
                 <CFormGroup>
                   <CLabel>QR yape</CLabel>
                   <CCol>
                     <CInputFile accept='image/*' custom id="yape" onChange={this.onchange}/>
                     <CLabel htmlFor="custom-file-input" variant="custom-file">
-                      Elige archivo...
+                      {this.state.yape !== "" ? this.state.yape.name : "Elige archivo..."}
                     </CLabel>
+                    <p className="text-danger">{this.state.error.yape}</p>
                   </CCol>
                 </CFormGroup>
                 <CFormGroup>
@@ -209,13 +275,15 @@ class InformacionUsuario extends Component {
                   <CCol>
                     <CInputFile accept='image/*' custom id="plin" onChange={this.onchange}/>
                     <CLabel htmlFor="custom-file-input" variant="custom-file">
-                      Elige archivo...
+                    {this.state.plin !== "" ? this.state.plin.name : "Elige archivo..."}
                     </CLabel>
+                    <p className="text-danger">{this.state.error.plin}</p>
                   </CCol>
                 </CFormGroup>
                 <CFormGroup className="mt-4">
                     <CLabel type='number'>Ruc NRUS</CLabel>
                     <CInput id="ruc" placeholder="Ingrese su número de RUC" required onChange={this.onchange} value={this.state.usuario.idVendedor ? this.state.usuario.idVendedor.ruc : "" }/>
+                    <p className="text-danger">{this.state.error.ruc}</p>
                 </CFormGroup>
             </CCol>
         </CRow>
