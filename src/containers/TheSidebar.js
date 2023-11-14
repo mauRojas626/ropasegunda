@@ -30,7 +30,7 @@ const TheSidebar = () => {
       </CSidebarBrand>
       <CSidebarNav>
         <CCreateElement
-          items={user == null ? invitado : user.correo === 'admin' ? admin : user.idVendedor === 0 ? comprador :  vendedor}
+          items={user == null ? invitado : user.correo === 'admin' ? admin : user.idVendedor === 0 || user.idVendedor.aprobado !== 1 ? comprador :  vendedor}
           components={{
             CSidebarNavDivider,
             CSidebarNavDropdown,

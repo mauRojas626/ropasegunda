@@ -6,10 +6,10 @@ export default class PrendaModel extends SimpleProperty {
     precio = 0;
     talla = '';
     color = '';
-    detalles = '';
+    detalle = 'Ninguno';
     marca = '';
     sexo = 0;
-    categoría = '';
+    categoría = 'Saco';
     material = '';
     fotos = [];
     fechaPublicacion = '';

@@ -24,12 +24,21 @@ class Administrador extends Component {
   }
 
   onAccept = async (usuario) => {
-    usuario.idVendedor.aprobado = 1;
-    console.log(usuario)
-    let res = await this.props.validateRuc(usuario);
+    usuario.idVendedor.aprobado = 1
+    let res = await this.props.validateRuc(usuario)
     if(res.type === 'VALIDATE_RUC'){
       this.setState({usuarios: this.state.usuarios.filter(item => item.idVendedor.RUC !== usuario.idVendedor.RUC)})
       let notificacion = new notification('success', 'Aprobación exitosa', 'RUC aprobado correctamente');
+      this.setState({createResults: [...this.state.createResults, notificacion]})
+    }
+  }
+
+  onDecline = async (usuario) => {
+    usuario.idVendedor.aprobado = 2
+    let res = await this.props.validateRuc(usuario)
+    if(res.type === 'VALIDATE_RUC'){
+      this.setState({usuarios: this.state.usuarios.filter(item => item.idVendedor.RUC !== usuario.idVendedor.RUC)})
+      let notificacion = new notification('success', 'RUC rechazado', 'Se envió una notificación al usuario');
       this.setState({createResults: [...this.state.createResults, notificacion]})
     }
   }
@@ -54,7 +63,7 @@ class Administrador extends Component {
                         <CButton color='primary' size='sm' onClick={() => this.onAccept(usuario)}>
                             <CIcon name='cil-check'></CIcon>
                         </CButton>{'  '}
-                        <CButton color='danger' size='sm' onClick={() => this.setState({calificar: true})}>
+                        <CButton color='danger' size='sm' onClick={() => this.onDecline(usuario)}>
                             <CIcon name='cil-x'></CIcon>
                         </CButton>
                     </CCol>

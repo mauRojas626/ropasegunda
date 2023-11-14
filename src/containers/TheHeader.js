@@ -79,9 +79,9 @@ const TheHeader = () => {
     }
   }
   const onSubmit =  async () => {
-    let user1 = { correo: usuario, clave: clave }   
+    let user1 = { correo: usuario, clave: clave }
     if(confirmacion) {
-      await dispatch(login(user1)) 
+      await dispatch(login(user1))
       if(!isAuthenticated) setError(true)
       else setError(false)
     }
@@ -89,6 +89,10 @@ const TheHeader = () => {
       let res = await dispatch(createBuyer(user1))
       if(res.type === 'CREATE_BUYER') {
         let newNotification = new notification('success', 'Registro exitoso', 'Usuario registrado correctamente')
+        setCreateResults([...createResults, newNotification])
+      }
+      else {
+        let newNotification = new notification('danger', 'Error en el registro', 'No se pudo registrar el usuario')
         setCreateResults([...createResults, newNotification])
       }
       setRegistrarse(false)
@@ -100,6 +104,8 @@ const TheHeader = () => {
   useEffect(() => {
     if (isAuthenticated) {
       setConfirmacion(false);
+      setClave('')
+      setUsuario('')
     } else {
       setError(false);
     }

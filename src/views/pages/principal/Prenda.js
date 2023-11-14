@@ -20,6 +20,7 @@ class Prenda extends Component {
             compra: false,
             modal: false,
             modal2: false,
+            tipo: 0,
         }
     }
 
@@ -31,8 +32,11 @@ class Prenda extends Component {
 
     comprar = async () => {
         if(this.props.auth === false){
-            this.setState({modal2: true})
-        } else {
+            this.setState({modal2: true, tipo: 0})
+        } else if(this.props.user.dni === null || this.props.user.nombre === null || this.props.user.apellido === null){
+            this.setState({modal2: true, tipo: 1})
+        }
+        else {
             let res = await this.props.blockClothes(this.props.location.state.prenda.idPrenda)
             if(res.type === "BLOCK_CLOTHES"){
                 this.setState({compra: true, modal: true})
@@ -60,7 +64,7 @@ class Prenda extends Component {
                     <CModalTitle>{this.state.compra ? "Comprar prenda" : "Prenda Vendida"}</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    {this.state.compra ? "Recuerde que solo tiene 3 minutos para realizar el pago de la prenda" : "La prenda ya ha sido vendida"}
+                    {this.state.compra ? "Recuerde que solo tiene 10 minutos para realizar el pago de la prenda" : "La prenda ya ha sido vendida"}
                 </CModalBody>
                 <CModalFooter>
                     <Link className="link" to={{pathname: "./Pago", state: {prenda: this.props.location.state.prenda}}} >
@@ -70,10 +74,10 @@ class Prenda extends Component {
             </CModal>
             <CModal show={this.state.modal2} onClose={() => this.setState({modal2: false})} >
                 <CModalHeader>
-                    <CModalTitle>{"Inicia sesión"}</CModalTitle>
+                    <CModalTitle>{this.state.tipo === 0 ? "Inicia sesión" : "Actualizar datos"}</CModalTitle>
                 </CModalHeader>
                 <CModalBody>
-                    {"Para poder comprar la prenda, debes iniciar sesión"}
+                    {this.state.tipo === 0 ? "Para poder comprar la prenda, debes iniciar sesión" : "Para poder comprar la prenda, debes actualizar tus datos"}
                 </CModalBody>
                 <CModalFooter>
                     <CButton color="primary" onClick={() => this.setState({modal2: false})}>Aceptar</CButton>
@@ -103,7 +107,7 @@ class Prenda extends Component {
                             <span style={{float: "right"}}> <CIcon name="cil-star"/> {" " + this.props.location.state.prenda.rating.toFixed(1)}</span>
                             <h4>{this.props.location.state.prenda.nombre}</h4>
                             <h6>Talla: {this.props.location.state.prenda.talla}</h6>
-                            <h6>S/ {this.props.location.state.prenda.precio}</h6>
+                            <h6>Precio: S/ {this.props.location.state.prenda.precio}</h6>
                             <h6>Color: {this.props.location.state.prenda.color}</h6>
                             <h6>Marca: {this.props.location.state.prenda.marca}</h6>
                             <h6>Material: {this.props.location.state.prenda.material}</h6>
@@ -179,15 +183,17 @@ class Prenda extends Component {
                                         <h3>Comentarios</h3>
                                     </CCol>
                                     {comentarios.map(comentario => (
-                                        <CRow className='m-auto'>
-                                            <CCol md="2" className='m-auto'>
-                                                <h5><CIcon name="cil-star"/>{" " + comentario.calificacion.toFixed(1)}</h5>
-                                            </CCol>
-                                            <CCol md="10">
-                                                <span > {comentario.texto}</span>
-                                            </CCol>
-                                            
-                                        </CRow>
+                                        <CCol xs="12" md="12" className="m-3" key={comentario.idComentario}>
+                                            <CRow>
+                                                <CCol md="2">
+                                                    <h5><CIcon name="cil-star"/>{" " + comentario.calificacion.toFixed(1)}</h5>
+                                                </CCol>
+                                                <CCol md="10">
+                                                    <span > {comentario.texto}</span>
+                                                </CCol>
+                                                
+                                            </CRow>
+                                        </CCol>
                                     ))}
                                 </CRow>
                             </CCol>
@@ -207,7 +213,8 @@ class Prenda extends Component {
 
 const mapStateToProps = state => {
     return {
-        auth: state.auth.isAuthenticated
+        auth: state.auth.isAuthenticated,
+        user: state.auth.user,
     }
   }
   

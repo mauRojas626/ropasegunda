@@ -26,7 +26,7 @@ const FileUpload = ({modo, newPhoto, removePhoto, fotosOld}) => {
     const { getRootProps, getInputProps, isDragActive } = useDropzone({onDrop, accept: {'image/*': []}})
 
     const removeFile = (name) => {
-      setFiles(files => files.filter(files => files.nombre !== name))
+      setFiles(files => files.filter(files => files.name !== name))
       removePhoto(name)
     }
 //TO DO : Customize and Style this Drag and Drop to Upload box as you want🧑💻😊
@@ -42,9 +42,8 @@ const FileUpload = ({modo, newPhoto, removePhoto, fotosOld}) => {
       {m === 'fotos' ?<CRow>
         {files.map((file, index) => (
                 <CCol md="3" key={index}>
-                  <CBadge onClick={() => removeFile(file.nombre)} shape="pill" color="danger" className="float-right mr-2">X</CBadge>
+                  <CBadge onClick={() => removeFile(file.name)} shape="pill" color="danger" className="float-right mr-2">X</CBadge>
                   <CImg src={file.url} style={{maxHeight: "15rem"}}></CImg>
-                  
                 </CCol>
             ))
         }

@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as buyerActions from '../../../services/redux/actions/comprador'
 import * as authActions from '../../../services/redux/actions/auth'
+import * as provinciaActions from '../../../services/redux/actions/provincia'
 import notification from 'src/services/models/notificacion'
 import Notification from '../common/Notification'
 
@@ -22,14 +23,19 @@ class InformacionUsuario extends Component {
         yape: "",
         plin: "",
         createResults: [],
-        error: []
+        error: {}
     }
   }
   
   
   async componentDidMount(){
-    this.setState({usuario: this.props.user})
-    if(this.props.departamento.length === 0){
+    let user = this.props.user
+    if(user.idVendedor !== undefined && user.idVendedor !== 0){
+      user.idVendedor.ruc = user.idVendedor.RUC
+      this.setState({yape: {name: user.idVendedor.qrYape}, plin: {name: user.idVendedor.qrPlin}})
+    }
+    this.setState({usuario: user})
+    if(this.props.departamento === undefined){
       await this.props.getCities()
     }
     this.setState({provincia: this.props.provincia, departamento: this.props.departamento})
@@ -38,7 +44,7 @@ class InformacionUsuario extends Component {
   onSubmit = async () => {
     //validar
     let pattern = /^[A-Za-z]+$/;
-    let error = []
+    let error = {}
     if(this.state.usuario.nombre !== null && !pattern.test(this.state.usuario.nombre)){
       error.nombre = "El nombre solo puede contener letras"
     }
@@ -87,13 +93,13 @@ class InformacionUsuario extends Component {
       }
     }
     this.setState({error: error})
-    if(error.length === 0){
+    if(Object.keys(error).length === 0){
       const formData = new FormData();
-      if(this.state.yape !== ""){
+      if(this.state.yape !== "" && this.state.yape.data !== undefined){
         const newFileName = `${Date.now()}_${this.state.yape.name}`
         formData.append('yape', this.state.yape, newFileName)
       }
-      if(this.state.plin !== ""){
+      if(this.state.plin !== "" && this.state.plin.data !== undefined){
         const newFileName = `${Date.now()}_${this.state.plin.name}`
         formData.append('plin', this.state.plin, newFileName)
       }
@@ -310,7 +316,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-      ...bindActionCreators(Object.assign({},buyerActions, authActions), dispatch)
+      ...bindActionCreators(Object.assign({},buyerActions, authActions, provinciaActions), dispatch)
   }
 }
 

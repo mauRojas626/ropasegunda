@@ -1,18 +1,18 @@
-import { CRow, CCol, CInput, CFormGroup, CLabel, CInputGroup, CInputGroupPrepend, CInputGroupText, CSelect, CButton, CModal, CModalTitle, CModalBody, CModalFooter, CModalHeader, CLink } from '@coreui/react'
+import { CRow, CCol, CInput, CFormGroup, CLabel, CInputGroup, CInputGroupPrepend, CInputGroupText, CSelect, CButton, CModal, CModalTitle, CModalBody, CModalFooter, CModalHeader } from '@coreui/react'
 import React, { Component } from 'react'
 import FileUpload from 'src/views/dropzone/FileUpload';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import ClothesModel from '../../../services/models/PrendaModel'
+import PrendaModel from '../../../services/models/PrendaModel'
 import * as clothesActions from '../../../services/redux/actions/prenda'
 import MedidaModel from 'src/services/models/MedidaModel';
-
+import { Link } from 'react-router-dom';
 
 class NuevaPrenda extends Component {
     constructor(props){
         super(props);
         this.state = {
-            clothes: new ClothesModel(), 
+            clothes: new PrendaModel(), 
             size: new MedidaModel(),
             files: [],
             removeFiles: [],
@@ -26,8 +26,11 @@ class NuevaPrenda extends Component {
 
     componentDidMount(){
         if(this.props.location.state){
+            let files = this.props.location.state.prenda.fotos.map((file, index) => {
+                return {...file, name: file.nombre}
+            })
             this.setState({clothes: this.props.location.state.prenda, sexo: this.props.location.state.prenda.sexo, categoria: this.props.location.state.prenda.categoria,
-            files: this.props.location.state.prenda.fotos, oldFiles: this.props.location.state.prenda.fotos, size: this.props.location.state.prenda.idMedida})
+            files: files, oldFiles: files, size: this.props.location.state.prenda.idMedida})
         }
     }
     
@@ -51,7 +54,7 @@ class NuevaPrenda extends Component {
         this.setState({size: updatedClothes});
     }
 
-    onChangeSelect = () => (e) => {
+    onChangeSelect = (key) => (e) => {
         const { clothes } = this.state;
         const value = e.target.value;
         let updatedClothes = { ...clothes };
@@ -76,6 +79,7 @@ class NuevaPrenda extends Component {
 
     onRemovePhoto = (filename) => {
         const { files } = this.state;
+        
         let updateFiles = files.filter(file => file.name !== filename)
         if(this.state.oldFiles.find(file => file.nombre === filename)){
             this.setState({removeFiles: [...this.state.removeFiles, filename]})
@@ -101,11 +105,18 @@ class NuevaPrenda extends Component {
         } else {
             await this.props.updateClothes(formData)
         }
-        this.setState({confirmacion: true, clothes: new ClothesModel(), size: new MedidaModel(), files: []})
+        this.setState({confirmacion: true, clothes: new PrendaModel(), size: new MedidaModel(), files: []})
     }
 
     render() {
-    
+    let files = []
+    if(this.props.location.state !== undefined) {
+        files = this.props.location.state.prenda.fotos.map((file, index) => {
+            return {...file, name: file.nombre}
+        })
+    } else {
+        files = this.state.files
+    }
     return (
         <>
         <CCol>
@@ -166,7 +177,7 @@ class NuevaPrenda extends Component {
                                     largo mangas (cm)
                                 </CInputGroupText>
                             </CInputGroupPrepend>
-                            <CInput id="mangas" name="margas" placeholder="cm" onChange={this.onChangeMedida('largoMangas')} value={this.state.size.largoManga}/>
+                            <CInput id="mangas" name="margas" placeholder="cm" onChange={this.onChangeMedida('largoManga')} value={this.state.size.largoManga}/>
                         </CInputGroup>
                         <CInputGroup className="m-2">
                             <CInputGroupPrepend>
@@ -211,8 +222,19 @@ class NuevaPrenda extends Component {
                         <CInput id="material" placeholder="Ingrese el material de la prenda" required onChange={this.onChange('material')} value={this.state.clothes.material}/>
                     </CFormGroup>
                     <CFormGroup>
-                        <CLabel type='text'>Detalles</CLabel>
-                        <CInput id="detalle" placeholder="Ingrese los detalles de la prenda" required onChange={this.onChange('detalle')} value={this.state.clothes.detalle}/>
+                        <CLabel type='text'>Tipo detalle</CLabel>
+                        <CSelect custom id="detalle" onChange={this.onChange('detalle')} value={this.state.clothes.detalle}>
+                        <option value="Ninguno">Ninguno</option>
+                        <option value="Rotura">Rotura</option>
+                        <option value="Mancha">Mancha</option>
+                        <option value="Incompleto">Le falta algo</option>
+                        <option value="Decolorado">Decolorado</option>
+                        <option value="Otros">Otro</option>
+                        </CSelect>
+                    </CFormGroup>
+                    <CFormGroup>
+                        <CLabel type='text'>Descripción detalle</CLabel>
+                        <CInput id="descripcion" placeholder="Ingrese los detalles de la prenda" required onChange={this.onChange('descripcion')} value={this.state.clothes.descripcion}/>
                     </CFormGroup>
                 </CCol>
             </CRow>
@@ -220,7 +242,7 @@ class NuevaPrenda extends Component {
                 <CCol>
                     <span>fotos</span>
                     <CCol xs="12" sm="12" className="m-auto">
-                        <FileUpload modo="fotos" newPhoto={this.onAddPhotos} removePhoto={this.onRemovePhoto} fotosOld={this.props.location.state ? this.props.location.state.prenda.fotos : []}></FileUpload>
+                        <FileUpload modo="fotos" newPhoto={this.onAddPhotos} removePhoto={this.onRemovePhoto} fotosOld={this.props.location.state !== undefined ? files : []}></FileUpload>
                     </CCol>
                 </CCol>
             </CRow>
@@ -246,7 +268,7 @@ class NuevaPrenda extends Component {
             </CModalBody>
             <CModalFooter>
             <CButton color="primary" onClick={() => this.setState({confirmacion: !this.state.confirmacion})}>
-                <CLink to={'/en-venta'}>Aceptar</CLink>
+                <Link to={'/en-venta'}>Aceptar</Link>
             </CButton>
             </CModalFooter>
         </CModal>

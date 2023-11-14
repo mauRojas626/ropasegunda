@@ -25,8 +25,10 @@ class Prendas extends Component {
             caderaMax: 1000,
             cinturaMin: 0,
             cinturaMax: 1000,
+            alldetalles: [],
+            detalles: [],
             califMax: 5,
-            califMin: 1,
+            califMin: 0,
             sexo: [0, 1]
         }
     }
@@ -39,15 +41,18 @@ class Prendas extends Component {
         const tallas = Array.from(
             new Set(this.props.clothes.map(item => item.talla))
         );
+        const detalles = Array.from(
+            new Set(this.props.clothes.map(item => item.detalle))
+        );
         this.props.clothes.forEach( (item) => {
             if(item.idVendedor.comentarios.length === 0) {
-                item.rating = -1
+                item.rating = 0
             } else {
                 item.rating = item.idVendedor.comentarios.reduce((a, b) => a + b.calificacion, 0) / item.idVendedor.comentarios.length
             }
 
         })
-        this.setState({ clothes: this.props.clothes, categorias: categorias, allCat: categorias, tallas: tallas, allSize: tallas})
+        this.setState({ clothes: this.props.clothes, categorias: categorias, allCat: categorias, tallas: tallas, allSize: tallas, alldetalles: detalles})
         
     }
 
@@ -114,11 +119,12 @@ class Prendas extends Component {
 
     render() {
         const {clothes} = this.state
+        
         const clothesFilter = clothes.filter(item => ((this.state.categoria === item.categoria || this.state.categoria === "todos") && item.precio >= this.state.precioMin && 
             item.precio <= this.state.precioMax && item.idMedida.busto >= this.state.bustoMin && item.idMedida.busto <= this.state.bustoMax && 
             item.idMedida.cadera >= this.state.caderaMin && item.idMedida.cadera <= this.state.caderaMax && item.idMedida.cintura >= this.state.cinturaMin 
             && item.idMedida.cintura <= this.state.cinturaMax && this.state.sexo.includes(item.sexo) && (this.state.talla === item.talla || this.state.talla === "todos")
-            && item.rating >= this.state.califMin && item.rating <= this.state.califMax)
+            && (item.rating >= this.state.califMin && item.rating <= this.state.califMax) && (this.state.detalles.length === 0 || !this.state.detalles.includes(item.detalle)))
           )
         return (
             <CRow>
@@ -146,12 +152,12 @@ class Prendas extends Component {
                                             <CCol className="m-0">
                                                 <CFormGroup variant="custom-radio" className="checkbox" key="0">
                                                     <CInputRadio id={0} name={"todos"} value={"todos"} checked={this.state.categoria === "todos"} onChange={()=>this.setState({categoria: "todos"})} />
-                                                    <CLabel variant="custom-radio" htmlFor={0}>Todos</CLabel>
+                                                    <CLabel htmlFor={0}>Todos</CLabel>
                                                 </CFormGroup>
                                                 {this.state.allCat.map((item, index) =>
                                                     <CFormGroup variant="custom-radio" className="checkbox" key={index}>
                                                         <CInputRadio id={index} name={index} value={item} checked={this.state.categoria === item} onChange={()=>this.setState({categoria: item})} />
-                                                        <CLabel variant="custom-radio" htmlFor={index}>{item}</CLabel>
+                                                        <CLabel htmlFor={index}>{item}</CLabel>
                                                     </CFormGroup>
                                                 )}
                                             </CCol>
@@ -267,12 +273,12 @@ class Prendas extends Component {
                                             <CCol>
                                                 <CFormGroup variant="custom-radio">
                                                     <CInputRadio id={0} name={0} value={"todos"} checked={this.state.talla === "todos"} onChange={this.onChangeLabel} />
-                                                    <CLabel variant="custom-radio" htmlFor={0}>Todos</CLabel>
+                                                    <CLabel htmlFor={0}>Todos</CLabel>
                                                 </CFormGroup>
                                                 {this.state.allSize.map((talla, index) =>
                                                     <CFormGroup variant="custom-radio" key={index}>
                                                         <CInputRadio id={index} name={index} value={talla} checked={this.state.talla === talla} onChange={this.onChangeLabel} />
-                                                        <CLabel variant="custom-radio" htmlFor={index}>{talla}</CLabel>
+                                                        <CLabel htmlFor={index}>{talla}</CLabel>
                                                     </CFormGroup>
                                                 )}
                                                 
@@ -296,18 +302,19 @@ class Prendas extends Component {
                                     <CCardBody>
                                         <CRow className="g-0 inline ">
                                             <CCol>
-                                                <CFormGroup variant="checkbox" className="checkbox">
-                                                <CInputCheckbox 
-                                                    id="checkbox1" 
-                                                    name="checkbox1" 
-                                                    value="option1" 
-                                                />
-                                                <CLabel variant="checkbox" className="form-check-label" htmlFor="checkbox1">Si</CLabel>
+                                                Excluir
+                                                { this.state.alldetalles.map((item, index) => <CFormGroup variant="checkbox" className="checkbox" key={index}>
+                                                    <CInputCheckbox
+                                                        id={index}
+                                                        name={index}
+                                                        value={item}
+                                                        checked={this.state.detalles.includes(item)}
+                                                        onChange={() => this.setState({detalles: this.state.detalles.includes(item) ? this.state.detalles.filter(item2 => item2 !== item) : [...this.state.detalles, item]})}
+                                                    />
+                                                    <CLabel variant="checkbox" className="form-check-label" htmlFor={index}>{item}</CLabel>
                                                 </CFormGroup>
-                                                <CFormGroup variant="checkbox" className="checkbox">
-                                                <CInputCheckbox id="checkbox2" name="checkbox2" value="option2" />
-                                                <CLabel variant="checkbox" className="form-check-label" htmlFor="checkbox2">No</CLabel>
-                                                </CFormGroup>
+
+                                                )}
                                             </CCol>
                                         </CRow>
                                     </CCardBody>

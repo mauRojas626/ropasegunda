@@ -11,7 +11,8 @@ import {
     getClothes as getClothesAPI,
     updateClothes as updateClothesAPI,
     deleteClothes as deleteClothesAPI,
-    blockClothes as blockClothesAPI
+    blockClothes as blockClothesAPI,
+    unBlockClothes as unblockClothesAPI
 } from '../../api/prenda-api'
 
 import ResponseModel from '../../models/ResponseModel'
@@ -144,7 +145,7 @@ const blockClothes = (id) => async (dispatch) => {
 const unBlockClothes = (id) => async (dispatch) => {
     let res = new ResponseModel();
     try{
-        res = await blockClothesAPI(id);
+        res = await unblockClothesAPI(id);
         
         if(!res.error && res.status >= 200 && res.status <= 300){
             return dispatch({

@@ -23,7 +23,7 @@ import { updateQuestion } from 'src/services/redux/actions/consulta'
 
 const TheHeaderDropdownMssg = ({ user }) => {
   const dispatch = useDispatch()
-  const itemsCount = user && user.idVendedor !== 0 ? user.idVendedor.consultas.length : 0
+  const itemsCount = user && user.idVendedor !== 0 && user.idVendedor.consultas != null ? user.idVendedor.consultas.length : 0
   const [modal, setModal] = React.useState(false)
   const [consulta, setConsulta] = React.useState('')
   const [respuesta, setRespuesta] = React.useState('')
@@ -72,7 +72,7 @@ const TheHeaderDropdownMssg = ({ user }) => {
         >
           <strong>Consultas</strong>
         </CDropdownItem>
-        {user && user.idVendedor ? user.idVendedor.consultas.map((consulta, index) => 
+        {user && user.idVendedor && user.idVendedor.consultas != null ? user.idVendedor.consultas.map((consulta, index) => 
           <CDropdownItem key={index} onClick={() => responder(consulta)}>
             <div className="message">
               <div className="pt-3 mr-3 float-left">

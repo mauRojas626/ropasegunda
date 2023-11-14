@@ -17,6 +17,7 @@ class Pago extends Component {
             time: 600,
             modal: false,
             modal2: false,
+            comprado: false
         }
     }
 
@@ -29,6 +30,7 @@ class Pago extends Component {
     }
 
     async componentDidMount() {
+        this.setState({comprado: false})
         this.countdown = setInterval(async () => {
           if (this.state.time > 0) {
             this.setState((prevState) => ({ time: prevState.time - 1 }));
@@ -42,7 +44,7 @@ class Pago extends Component {
 
     async componentWillUnmount() {
         clearInterval(this.countdown);
-        await this.props.unBlockClothes(this.props.location.state.prenda.idPrenda)
+        if(!this.state.comprado) await this.props.unBlockClothes(this.props.location.state.prenda.idPrenda)
     }
 
     onSubmit = async () => {
@@ -59,7 +61,7 @@ class Pago extends Component {
             formData.append('venta', JSON.stringify(venta));
             await this.props.payShip(formData)
         }
-        this.setState({modal: !this.state.modal})
+        this.setState({modal: !this.state.modal, comprado: true})
     }
 
     formatTimeRemaining(seconds) {
