@@ -26,4 +26,11 @@ const validateRuc = async (buyer) => {
     return await apiPost(`buyers/validateRuc`, buyer);
 }
 
-export { getBuyers, createBuyer, updateBuyer, deleteBuyer, validateBuyer, validateRuc } 
+const reportUser = async (user) => {
+    return await apiPost(`buyers/reportar`, user)
+}
+
+const blockUser = async (user) => {
+    return await apiPost(`buyers/boquear`, user)
+}
+export { getBuyers, createBuyer, updateBuyer, deleteBuyer, validateBuyer, validateRuc, reportUser, blockUser } 

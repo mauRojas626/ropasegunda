@@ -3,13 +3,17 @@ import {
     CREATE_BUYER,
     UPDATE_BUYER,
     ERROR_BUYER,
-    VALIDATE_RUC
+    VALIDATE_RUC,
+    REPORT_USER,
+    BLOCK_USER
 } from './actionTypes/comprador'
 import { 
     createBuyer as createBuyerAPI,
     getBuyers as getBuyersAPI,
     updateBuyer as updateBuyerAPI,
-    validateRuc as validateRucAPI
+    validateRuc as validateRucAPI,
+    reportUser as reportUserAPI,
+    blockUser as blockUserAPI
 } from '../../api/comprador-api'
 
 import ResponseModel from '../../models/ResponseModel'
@@ -103,4 +107,40 @@ const validateRuc = (buyer) => async (dispatch) => {
     }
 }
 
-export { getBuyers, createBuyer, updateBuyer, validateRuc }
+const reportUser = (user) => async (dispatch) => {
+    let res = new ResponseModel();
+    try {
+        res = await reportUserAPI(user);
+        if(!res.error && res.status >= 200 && res.status <= 300){
+            return dispatch({
+                type: REPORT_USER,
+                payload: user.idVendedor
+            })
+        }
+    } catch(e){
+        console.log(e);
+        console.log('ERROR! '+REPORT_USER);
+        console.log(res.status);
+        console.log(res.error);
+    }
+}
+
+const blockUser = (user) => async (dispatch) => {
+    let res = new ResponseModel();
+    try {
+        res = await blockUserAPI(user);
+        if(!res.error && res.status >= 200 && res.status <= 300){
+            return dispatch({
+                type: BLOCK_USER,
+                payload: user.idVendedor
+            })
+        }
+    } catch(e){
+        console.log(e);
+        console.log('ERROR! '+BLOCK_USER);
+        console.log(res.status);
+        console.log(res.error);
+    }
+}
+
+export { getBuyers, createBuyer, updateBuyer, validateRuc, reportUser, blockUser }
