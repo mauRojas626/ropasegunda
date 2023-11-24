@@ -3,7 +3,7 @@ import SimpleProperty from './SimpleProperty'
 export default class PrendaModel extends SimpleProperty {
     id = 0;
     nombre = '';
-    precio = 0;
+    precio = '';
     talla = '';
     color = '';
     detalle = 'Ninguno';

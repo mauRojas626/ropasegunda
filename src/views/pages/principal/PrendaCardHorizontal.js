@@ -40,9 +40,9 @@ export default class PrendasCardHorizontal extends Component {
                     <br/>
                     <h6>Talla: {this.props.venta ? this.props.venta.prenda[0].talla : this.props.prenda.talla}</h6>
                     <h6>S/ {this.props.venta ? this.props.venta.prenda[0].precio : this.props.prenda.precio}</h6>
-                    <h6>Detalles: {this.props.venta ? this.props.venta.prenda[0].detalle !== "" ? "Si" : "No" : this.props.prenda.detalle !== "" ? "Si" : "No"}</h6>
+                    <h6>Detalles: {this.props.venta ? this.props.venta.prenda[0].detalle !== "Ninguno" ? "Si" : "No" : this.props.prenda.detalle !== "Ninguno" ? "Si" : "No"}</h6>
                 </CCol>
-                {this.props.modo === "enventa" || this.props.modo === "enviar" ? <></> : 
+                {this.props.modo === "enventa" || this.props.modo === "enviar" || this.props.modo === "admin"  ? <></> : 
                 <CCol sm="4" className="m-auto">
                     <h6>Fecha de compra: {this.props.venta ? this.props.venta.fechaCompra.slice(0,10): ""}</h6>
                     {this.props.modo === "pe" ? <>
@@ -51,6 +51,15 @@ export default class PrendasCardHorizontal extends Component {
                     </> : <h6>Pedir envío antes de: {this.props.venta ? new Date(new Date(this.props.venta.fechaCompra).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0,10): ""}</h6>}
                     {this.props.venta ? this.props.venta.estado === 1 ? <CButton color='primary' onClick={() => this.setState({modal: true})}>Ver Boleta</CButton>: <></>: <></>}
                 </CCol>
+                }
+                {this.props.modo === "admin" ?
+                <CCol sm="4" className="m-auto">
+                    <h6>Fecha de compra: {this.props.venta ? this.props.venta.fechaCompra.slice(0,10): ""}</h6>
+                    <h6>Fecha Confirmación Pago: {this.props.venta.fechaConfirmacionPago ? this.props.venta.fechaConfirmacionPago.toString().slice(0,10) : "" }</h6>
+                    <h6>Precio: S/ {this.props.venta.total}</h6>
+                    <CButton color='primary' size='sm' onClick={() => this.setState({modal: true})} disabled={this.props.venta.comprobantePago === null}>Ver Boleta</CButton>
+                    <CButton color='primary' size='sm' onClick={() => this.setState({modal2: true})}>Ver pago cliente</CButton>
+                </CCol> : null
                 }
             </CRow>
             <CModal show={this.state.modal} onClose={() => this.setState({modal: false})} >
@@ -64,6 +73,19 @@ export default class PrendasCardHorizontal extends Component {
                 </CModalBody>
                 <CModalFooter>
                     <CButton color="primary" onClick={() => this.setState({modal: false})}>Cerrar</CButton>
+                </CModalFooter>
+            </CModal>
+            <CModal show={this.state.modal2} onClose={() => this.setState({modal2: false})} >
+                <CModalHeader closeButton>
+                    <CModalTitle>comprobante de Pago</CModalTitle>
+                </CModalHeader>
+                <CModalBody>
+                    <CRow className="g-0"> 
+                        <CCardImg src={this.props.venta ? this.props.venta.comprobantePago: ""}></CCardImg>
+                    </CRow>
+                </CModalBody>
+                <CModalFooter>
+                    <CButton color="primary" onClick={() => this.setState({modal2: false})}>Cerrar</CButton>
                 </CModalFooter>
             </CModal>
             </>

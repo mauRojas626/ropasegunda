@@ -26,6 +26,19 @@ class SolicitudEnvio extends Component {
 
     async componentDidMount (){    
         await this.props.getCities()
+        if(this.props.user.direccion != null){
+            this.setState({direccion: this.props.user.direccion})
+        }
+        if(this.props.user.distrito != null){
+            this.setState({distrito: this.props.user.distrito})
+        }
+        if(this.props.user.telefono != null){
+            this.setState({telefono: this.props.user.telefono})
+        }
+        if(this.props.user.idProvincia != null){
+            let idDepartamento = this.props.provincia.filter(provincia => parseInt(provincia.idProvincia) === parseInt(this.props.user.idProvincia))[0].idDepartamento
+            this.setState({idProvincia: this.props.user.idProvincia, selectDepartamento: idDepartamento})
+        }
         this.setState({departamento: this.props.departamento, provincia: this.props.provincia})
     }
 
@@ -45,7 +58,7 @@ class SolicitudEnvio extends Component {
         if(this.state.distrito === ""){
             error.distrito = "Ingrese su distrito"
         }
-        if(this.state.telefono === "" || this.state.telefono.length !== 9 ){
+        if(this.state.telefono === "" || this.state.telefono.toString().length !== 9 ){
             error.telefono = "Ingrese su celular"
         }
         if(this.state.idProvincia === 0){
@@ -53,13 +66,10 @@ class SolicitudEnvio extends Component {
         }
         if (error.direccion || error.distrito || error.telefono || error.idProvincia){
             this.setState({error: error})
-            console.log("error.direccion")
-            console.log(error.direccion)
         } else {
-            console.log("envio")
             let envio = new EnvioModel()
             envio.direccion = this.state.direccion + " " + this.state.distrito 
-            envio.telefono = this.state.telefono
+            envio.telefono = this.state.telefono.toString()
             envio.idProvincia = this.state.idProvincia
             envio.tipoEntrega = this.state.agencia ? 1 : 2
             envio.idVenta = this.props.location.state.sell[0].idVenta
@@ -94,10 +104,10 @@ class SolicitudEnvio extends Component {
                     <h4>Elija su tipo de envío</h4>
                     <CRow>
                         <CCol>
-                            <CButton size='lg' onClick={this.onClick} block color={this.state.agencia ? "dark": "primary"} disabled={!this.state.agencia}>A domicilio</CButton>
+                            <CButton size='lg' onClick={this.onClick} block color={this.state.agencia ? "dark": "primary"} disabled={this.state.agencia}>A domicilio</CButton>
                         </CCol>
                         <CCol>
-                            <CButton size='lg' onClick={this.onClick} block color={!this.state.agencia ? "dark": "primary"} disabled={this.state.agencia}>Recojo en agencia</CButton>
+                            <CButton size='lg' onClick={this.onClick} block color={!this.state.agencia ? "dark": "primary"} disabled={!this.state.agencia}>Recojo en agencia</CButton>
                         </CCol>
                     </CRow>  
                 </CCol>
@@ -165,7 +175,8 @@ class SolicitudEnvio extends Component {
 const mapStateToProps = state => {
     return {
         departamento: state.provincia.cities.departamento,
-        provincia: state.provincia.cities.provincia
+        provincia: state.provincia.cities.provincia,
+        user: state.auth.user
     }
   }
   

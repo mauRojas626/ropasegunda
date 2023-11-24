@@ -20,7 +20,8 @@ export default class PrendaCard extends Component {
                         <span style={{float: "right"}}> <CIcon name="cil-star"/>{" " + this.props.prenda.rating < 1 ? "" : this.props.prenda.rating.toFixed(1)}</span>
                         <h5>{this.props.prenda.idVendedor.nombre + " " + this.props.prenda.idVendedor.apellido}</h5>
                         <h4>{this.props.prenda.nombre}</h4>
-                        <h6>Talla: {this.props.prenda.talla}</h6>
+                        <h6>Talla: {this.props.prenda.talla}</h6> 
+                        <h6>Medidas: {this.props.prenda.idMedida.busto ? this.props.prenda.idMedida.busto : "-"} / {this.props.prenda.idMedida.cintura ? this.props.prenda.idMedida.cintura : "-"} / {this.props.prenda.idMedida.cadera ? this.props.prenda.idMedida.cadera : "-"}</h6>
                         <h6>S/ {this.props.prenda.precio}</h6>
                         <h6>Detalles: {this.props.prenda.detalle}</h6>
                         </CCol>

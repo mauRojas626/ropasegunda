@@ -31,20 +31,27 @@ class Pago extends Component {
 
     async componentDidMount() {
         this.setState({comprado: false})
-        this.countdown = setInterval(async () => {
-          if (this.state.time > 0) {
-            this.setState((prevState) => ({ time: prevState.time - 1 }));
-          } else {
-            clearInterval(this.countdown);
-            this.setState({modal2: !this.state.modal2})
-            await this.props.unBlockCothes(this.props.location.state.prenda.idPrenda)
-          }
-        }, 1000);
+        if(this.props.location.state.prenda){
+            
+            this.countdown = setInterval(async () => {
+            if (this.state.time > 0) {
+                this.setState((prevState) => ({ time: prevState.time - 1 }));
+            } else {
+                clearInterval(this.countdown);
+                this.setState({modal2: !this.state.modal2})
+                await this.props.unBlockCothes(this.props.location.state.prenda.idPrenda)
+            }
+            }, 1000);
+        }
+        
     }
 
     async componentWillUnmount() {
         clearInterval(this.countdown);
-        if(!this.state.comprado) await this.props.unBlockClothes(this.props.location.state.prenda.idPrenda)
+        if (this.props.location.state && this.props.location.state.prenda && !this.state.comprado) {
+            await this.props.unBlockClothes(this.props.location.state.prenda.idPrenda);
+        }
+          
     }
 
     onSubmit = async () => {
@@ -78,14 +85,15 @@ class Pago extends Component {
             <CCol xs="12" sm="12" className="m-auto">
                 <CRow>
                     <CCol xs="12" sm="12" className="m-auto">
-                    <CCard>
+                    {this.props.location.state.prenda ? <CCard>
                         <CCardBody>
                             <CCol className='m-auto'>
                                 <h4>Tiempo para culminar la transacción: {this.formatTimeRemaining(this.state.time)}</h4>
                             </CCol>
                         </CCardBody>
-                    </CCard>
-                    {this.props.location.state.prenda ? <CCard>
+                    </CCard> : null }
+                    {this.props.location.state.prenda ? 
+                        <CCard>
                             <PrendasCardHorizontal prenda={this.props.location.state.prenda} modo="enviar"></PrendasCardHorizontal>
                         </CCard>
                     : <CCard>

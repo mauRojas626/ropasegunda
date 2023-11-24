@@ -10,11 +10,14 @@ import {
     VALIDATE_SHIP,
     PAY_SHIP,
     ENVIAR,
-    CALIFICAR
+    CALIFICAR,
+    GET_QUEJAS,
+    RESOLVER_QUEJA
 } from '../actions/actionTypes/venta'
 
 const initialState = {
     sell: [],
+    quejas: [],
     isLoading: true,
     failed: false
 };
@@ -43,6 +46,10 @@ const venta = (state = initialState, action) => {
             return {...state, sell: state.sell.map(item => item.idEnvio.idEnvio === action.playload.idEnvio ? {...item, estado: 6, idEnvio: action.playload} : item), failed: false};
         case CALIFICAR:
             return {...state, sell: state.sell.map(item => item.idEnvio.idEnvio === action.playload.idEnvio ? {...item, estado: 7} : item), failed: false};
+        case GET_QUEJAS:
+            return {...state, quejas: action.playload, isLoading: false, failed: false};
+        case RESOLVER_QUEJA:
+            return {...state, quejas: state.quejas.filter(item => item.id !== action.playload), failed: false};
         case ERROR_SELL:            
             return {...state, isLoading: false, failed: true};
         default:

@@ -1,10 +1,13 @@
-import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton, CInput, CCollapse, CInputCheckbox, CLabel, CFormGroup, CInputRadio } from '@coreui/react';
+import { CCard, CCardBody, CCardHeader, CCol, CRow, CButton, CInput, CCollapse, CInputCheckbox,
+     CLabel, CFormGroup, CInputRadio, CTooltip, CSelect, CPagination } from '@coreui/react';
 import React, { Component } from 'react'
 import PrendaCard from './PrendaCard';
 import CIcon from '@coreui/icons-react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as clothesActions from '../../../services/redux/actions/prenda'
+import Loader from '../common/Loader';
+import ErrorConnection from '../common/ErrorConnection';
 
 class Prendas extends Component {
     constructor(props){
@@ -29,7 +32,12 @@ class Prendas extends Component {
             detalles: [],
             califMax: 5,
             califMin: 0,
-            sexo: [0, 1]
+            sexo: [0, 1],
+            orden: "1",
+            isLoading: true,
+            failed: false,
+            currentPage: 1,
+            items: 9,
         }
     }
 
@@ -50,9 +58,9 @@ class Prendas extends Component {
             } else {
                 item.rating = item.idVendedor.comentarios.reduce((a, b) => a + b.calificacion, 0) / item.idVendedor.comentarios.length
             }
-
         })
-        this.setState({ clothes: this.props.clothes, categorias: categorias, allCat: categorias, tallas: tallas, allSize: tallas, alldetalles: detalles})
+        this.setState({ clothes: this.props.clothes, categorias: categorias, allCat: categorias, 
+            tallas: tallas, allSize: tallas, alldetalles: detalles, isLoading: this.props.isLoading, failed: this.props.failed})
         
     }
 
@@ -117,22 +125,52 @@ class Prendas extends Component {
         }
     }
 
+    ordenar = (e) => {
+        this.setState({orden: e.target.value})
+    }
+
+    pagina = (e) => {
+        this.setState({currentPage: e})
+    }
+
     render() {
+        const { isLoading, failed } = this.props
         const {clothes} = this.state
         
-        const clothesFilter = clothes.filter(item => ((this.state.categoria === item.categoria || this.state.categoria === "todos") && item.precio >= this.state.precioMin && 
+        const clothesFilter1 = clothes.filter(item => ((this.state.categoria === item.categoria || this.state.categoria === "todos") && item.precio >= this.state.precioMin && 
             item.precio <= this.state.precioMax && item.idMedida.busto >= this.state.bustoMin && item.idMedida.busto <= this.state.bustoMax && 
             item.idMedida.cadera >= this.state.caderaMin && item.idMedida.cadera <= this.state.caderaMax && item.idMedida.cintura >= this.state.cinturaMin 
             && item.idMedida.cintura <= this.state.cinturaMax && this.state.sexo.includes(item.sexo) && (this.state.talla === item.talla || this.state.talla === "todos")
             && (item.rating >= this.state.califMin && item.rating <= this.state.califMax) && (this.state.detalles.length === 0 || !this.state.detalles.includes(item.detalle)))
-          )
+        )
+        const clothesFilter = this.state.orden === "1" ? [...clothesFilter1].sort((a, b) => a.precio - b.precio) : this.state.orden === "2" 
+            ? [...clothesFilter1].sort((a, b) => b.precio - a.precio) : this.state.orden === "3" ? [...clothesFilter1].sort((a, b) => a.rating - b.rating) : [...clothesFilter1].sort((a, b) => b.rating - a.rating)
+
+
+        const totalItems = clothesFilter.length
+        const currentPage = this.state.currentPage <= 0 ? 1 : this.state.currentPage
+        const totalPages = Math.ceil(totalItems / this.state.items)
+        const startIndex = (currentPage - 1) * this.state.items
+        const endIndex = Math.min(startIndex + this.state.items - 1, totalItems - 1)
+        const currentItems = clothesFilter.slice(startIndex, endIndex + 1)
+        
         return (
+            <>
+            {failed ?
+                <ErrorConnection></ErrorConnection>
+                : isLoading ?
+                    <Loader></Loader>
+                    : 
             <CRow>
                 <CCol sm="3">
                     <CCard>
                         <CCardHeader>
                             <strong>Filtros</strong>
-                            {this.props.user ? <CButton className="float-right m-0 p-0" onClick={this.filter} >usar mis medidas</CButton> : null}
+                            {this.props.user ? 
+                                <CTooltip content="Utiliza las tus medidas guardadas para busca prendas de tu medida">
+                                    <CButton className="float-right m-0 p-0" onClick={this.filter} >usar mis medidas</CButton>
+                                </CTooltip> : null
+                            }
                         </CCardHeader>
                         <CCardBody className="p-0">
                             <CCard className="mb-0">
@@ -289,14 +327,16 @@ class Prendas extends Component {
                             </CCard>
                             <CCard className="mb-0">
                                 <CCardHeader>
-                                    <CButton 
-                                        block
-                                        className="text-left m-0 p-0" 
-                                        onClick={() => this.setState({collapse: this.state.collapse === 4 ? null : 4})}
-                                    >
-                                    <CIcon name='cil-chevron-bottom' className="float-right"></CIcon>
-                                    Detalles
-                                    </CButton>
+                                    <CTooltip content="Imperfectos que puede tener la prenda" placement='right'>
+                                        <CButton 
+                                            block
+                                            className="text-left m-0 p-0" 
+                                            onClick={() => this.setState({collapse: this.state.collapse === 4 ? null : 4})}
+                                        >
+                                        <CIcon name='cil-chevron-bottom' className="float-right"></CIcon>
+                                        Detalles
+                                        </CButton>
+                                    </CTooltip>
                                 </CCardHeader>
                                 <CCollapse show={this.state.collapse === 4}>
                                     <CCardBody>
@@ -358,17 +398,46 @@ class Prendas extends Component {
                         </CCardBody>
                     </CCard>
                 </CCol>
-                <CCol xs="12" sm="9" className="m-auto">
+                <CCol xs="12" sm="9">
+                    <CRow className="mb-2">
+                        <CCol sm='5'>
+                            <h6>{"Se encontraron " + clothesFilter.length + " resultados"}</h6>
+                        </CCol>
+                        <CCol sm='4'>
+                            <h5 className="float-right">Ordenar por</h5>
+                        </CCol>
+                        <CCol sm='3'>
+                            <CFormGroup>
+                                <CSelect custom name="order" id="order" className="float-right" value={this.state.orden} onChange={this.ordenar}>
+                                    <option value="1">Precio: menor a mayor</option>
+                                    <option value="2">Precio: mayor a menor</option>
+                                    <option value="3">Calificación: menor a mayor</option>
+                                    <option value="4">Calificación: mayor a menor</option>
+                                </CSelect>
+                            </CFormGroup>
+                            
+                        </CCol>
+                    </CRow>
                     <CRow xs="6" md="12">
-                        { clothesFilter.map((prenda,index) => 
+                        { currentItems.map((prenda,index) => 
                             <CCol key={index} xs="12" sm="6" md="4" className="mb-3">
                                 <PrendaCard onClick={this.onClick} key={prenda.id} prenda={prenda}></PrendaCard>
                             </CCol>
                         ) }
                     </CRow>
+                    <CRow xs="6" md="12">
+                        <CPagination
+                            align="center"
+                            addListClass="some-class"
+                            activePage={currentPage}
+                            pages={totalPages}
+                            onActivePageChange={this.pagina}
+                        />
+                    </CRow>
                 </CCol>
             </CRow>
-            
+    }
+            </>
         )
     }
 }
@@ -376,6 +445,8 @@ class Prendas extends Component {
 const mapStateToProps = state => {
     return {
         clothes: state.prenda.clothes,
+        isLoading: state.prenda.isLoading,
+        failed: state.prenda.failed,
         user: state.auth.user
     }
   }

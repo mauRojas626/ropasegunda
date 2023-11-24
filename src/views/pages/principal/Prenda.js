@@ -1,8 +1,7 @@
 import { CButton, CCard, CNav, CTabs, CCol, CRow, CNavItem,CNavLink, CTabContent, CTabPane, CDataTable, CInput, CInputGroupAppend, 
-    CInputGroup, CCarouselInner, CCarousel, CCarouselControl, CCarouselItem, CModal, CModalHeader, CModalBody, CModalFooter, CModalTitle } from '@coreui/react';
+    CInputGroup, CCarouselInner, CCarousel, CCarouselControl, CCarouselItem, CModal, CModalHeader, CModalBody, CModalFooter, CModalTitle, CImg, CCardBody } from '@coreui/react';
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom';
-import PrendaCard from './PrendaCard';
 import CIcon from '@coreui/icons-react';
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
@@ -189,6 +188,7 @@ class Prenda extends Component {
                                                     <h5><CIcon name="cil-star"/>{" " + comentario.calificacion.toFixed(1)}</h5>
                                                 </CCol>
                                                 <CCol md="10">
+                                                    <span>{comentario.fecha.toString().slice(0,10)}</span><br/>
                                                     <span > {comentario.texto}</span>
                                                 </CCol>
                                                 
@@ -203,7 +203,20 @@ class Prenda extends Component {
                     </CCard>
                 </CCol>
                 <CCol  xs="12" sm="4" className="m-top">
-                    <PrendaCard prenda={this.props.location.state.prenda} ></PrendaCard>
+                    <CCard>
+                        <CCardBody>
+                            <CRow>
+                                <CCol>
+                                    <h4>Cómo medir</h4>
+                                </CCol>
+                            </CRow>
+                            <CRow>
+                                <CCol>
+                                    <CImg src={process.env.PUBLIC_URL + '/medidas.png'} fluid/>
+                                </CCol>
+                            </CRow>
+                        </CCardBody>
+                    </CCard>
                 </CCol>
             </CRow>
             </>

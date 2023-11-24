@@ -1,4 +1,5 @@
-import { CButton, CTabPane, CInputFile, CCol, CRow, CNavItem, CNavLink, CTabContent, CTabs, CNav, CCard, CSelect, CCardHeader, CCollapse, CCardBody, CModalBody, CModalFooter, CModalHeader, CModalTitle, CModal, CCardImg, CFormGroup, CLabel, CInput } from '@coreui/react'
+import { CButton, CTabPane, CInputFile, CCol, CRow, CNavItem, CNavLink, CTabContent, CTabs, CNav, CCard, CSelect, CCardHeader, CCollapse,
+     CCardBody, CModalBody, CModalFooter, CModalHeader, CModalTitle, CModal, CCardImg, CFormGroup, CLabel, CInput, CTextarea } from '@coreui/react'
 import React, { Component } from 'react'
 import PrendasCardHorizontal from './PrendaCardHorizontal';
 import { Link } from 'react-router-dom';
@@ -6,6 +7,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import * as clothesActions from '../../../services/redux/actions/prenda'
 import * as sellActions from '../../../services/redux/actions/venta'
+import * as buyerActions from '../../../services/redux/actions/comprador'
+
 
 class EnVenta extends Component {
     constructor(props){
@@ -29,7 +32,11 @@ class EnVenta extends Component {
             enviado: false,
             validarPago2: false,
             historial: [], 
-            estado: "6"
+            estado: "6",
+            error: {},
+            reportar: false,
+            motivo: "",
+            reportados: []
         }
     }
     async componentDidMount(){
@@ -41,7 +48,14 @@ class EnVenta extends Component {
         let filteredSell = sell.filter((item) => item.idVendedor.idUsuario === this.props.user.idUsuario)
         let validar = filteredSell.filter((item) => item.estado === 0)
         let porEnviar = filteredSell.filter((item) => item.estado >= 2 && item.estado <= 5)
-        let historial = filteredSell.filter((item) => item.estado >= 6)
+        let historial = filteredSell.filter((item) => item.estado >= 6 && item.estado < 8)
+        let reportados = filteredSell.filter((item) => item.estado === 8)
+        reportados = reportados.map((item) => {
+            if(item.idEnvio === null){
+                return {...item, idEnvio: 0}
+            }
+            return item
+        })
         historial.sort((a, b) => new Date(b.fechaCompra) - new Date(a.fechaCompra))
         porEnviar.sort((a, b) => new Date(b.fechaCompra) - new Date(a.fechaCompra))
         const uniqueEnvio2 = [...new Set(historial.map((sell) => sell.idEnvio.idEnvio))]
@@ -59,7 +73,8 @@ class EnVenta extends Component {
         if(this.props.provincia.length === 0){
             await this.props.getCities()
         }
-        this.setState({clothes: clothes, user: this.props.user, validar: validar, porEnviar: sellByShip, provincia: this.props.provincia, departamento: uniqueDep, filterPorEnviar: sellByShip, historial: sellByShip2})
+        this.setState({clothes: clothes, user: this.props.user, validar: validar, porEnviar: sellByShip, provincia: this.props.provincia,
+             departamento: uniqueDep, filterPorEnviar: sellByShip, historial: sellByShip2, reportados: reportados})
     }
 
     onChangeFile = (e) => {
@@ -67,20 +82,26 @@ class EnVenta extends Component {
     }
 
     onChange = (e) => {
-        console.log(e.target.name)
         this.setState({[e.target.name]: e.target.value})
     }
 
     cotizar = async () => {
-        let envio = this.state.venta.idEnvio
-        envio.precioEnvio = parseFloat(document.getElementById("precio").value)
-        let sell = this.state.venta
-        sell.idEnvio = envio
-        await this.props.priceShipping(sell)
-        this.setState({cotizarEnvio: false})
-        let filterPorEnviar = this.state.filterPorEnviar
-        filterPorEnviar = filterPorEnviar.map((item) => item.map((sell) => sell.idVenta === this.state.venta.idVenta ? sell = {...sell, estado: 3} : sell))
-        this.setState({filterPorEnviar: filterPorEnviar})
+        if(document.getElementById("precio").value.length >= 1 && !isNaN(document.getElementById("precio").value)){
+            let envio = this.state.venta.idEnvio
+            envio.precioEnvio = parseFloat(document.getElementById("precio").value)
+            let sell = this.state.venta
+            sell.idEnvio = envio
+            await this.props.priceShipping(sell)
+            this.setState({cotizarEnvio: false})
+            let filterPorEnviar = this.state.filterPorEnviar
+            filterPorEnviar = filterPorEnviar.map((item) => item.map((sell) => sell.idVenta === this.state.venta.idVenta ? sell = {...sell, estado: 3} : sell))
+            this.setState({filterPorEnviar: filterPorEnviar})
+            this.setState({error: {}})
+        }
+        else {
+            this.setState({error: {precio: "Ingrese un precio válido"}})
+        }
+        
     }
 
     validatePago = async () => {
@@ -99,6 +120,30 @@ class EnVenta extends Component {
         this.setState({validarPago2: false, filterPorEnviar: this.state.filterPorEnviar.map((item) => item.map((sell) => sell.idVenta === this.state.venta.idVenta ? sell = {...sell, estado: 5} : sell))})
     }
 
+    reportar = async () => {
+        if(this.state.motivo.length < 250 && this.state.motivo.length > 0 && this.state.file){
+            const { motivo, vp, file } = this.state
+            let venta = vp
+            let queja = {}
+            queja.comentario = motivo
+            queja.tipo = venta.estado === 0 ? "Validación de pago" : "Validación de envío"
+            queja.idUsuario = venta.idComprador.idUsuario
+            venta.queja = queja
+            let data = new FormData()
+            data.append('venta', JSON.stringify(venta))
+            const newFileName = `${Date.now()}_${file.name}`
+            data.append('files', file, newFileName)
+            await this.props.reportUser(data)
+            this.setState({reportar: false, error: {}, file: false, motivo:"", validar: this.state.validar.filter(item => item.idVenta !== this.state.vp.idVenta)})
+        } else {
+            if(this.state.motivo.length === 0) this.setState({error: {motivo: "Ingrese un motivo"}})
+            if(this.state.motivo.length >= 250)
+            this.setState({error: {motivo: "Ingrese un motivo menor a 250 caracteres"}})
+            if(!this.state.file) this.setState({error: {file: "Ingrese un archivo"}})
+
+        }
+    }
+
     onDelete = async (id) => {
         await this.props.deleteClothes(id)
         this.setState({clothes: this.state.clothes.filter(cloth => cloth.idPrenda !== id)})
@@ -107,6 +152,7 @@ class EnVenta extends Component {
     onClickVP = (id) => {
         this.setState({validarPago: true, vp: this.state.validar.filter(item => item.idVenta === id)[0]})
     }
+
     onClickCE = (venta) => {
         if(venta.estado === 2){
             this.setState({cotizarEnvio: true, venta: venta})
@@ -149,9 +195,9 @@ class EnVenta extends Component {
         <>
         <h3>Prendas en venta</h3>
         <Link to="/en-venta/nuevo">
-        <CButton className="m-3" color='primary'>
-                Nueva prenda
-        </CButton>
+            <CButton className="m-3" color='primary'>
+                    Nueva prenda
+            </CButton>
         </Link>
         <CTabs>
             <CNav variant="tabs">
@@ -260,7 +306,19 @@ class EnVenta extends Component {
                                             >
                                                 <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
                                                     <span>Cliente: {venta[0].idComprador.nombre + " " + venta[0].idComprador.apellido}</span>
-                                                    <span> Dirección: {venta[0].idEnvio.direccion}</span>
+                                                    <span>
+                                                        {parseInt(venta[0].estado) === 2 ? (
+                                                            "Fecha de Solicitud:" +
+                                                            (venta[0].idEnvio && venta[0].idEnvio.fechaSolicitud
+                                                            ? venta[0].idEnvio.fechaSolicitud.toString().slice(0, 10)
+                                                            : "")
+                                                        ) : (
+                                                            "Fecha pago envío:" +
+                                                            (venta[0].idEnvio && venta[0].idEnvio.fechaPago
+                                                            ? venta[0].idEnvio.fechaPago.toString().slice(0, 10)
+                                                            : "")
+                                                        )}
+                                                    </span>
                                                     <span>Entrega: {parseInt(venta[0].idEnvio.tipoEntrega) === 2 ? "A domicilio" : "En agencia"}</span>
                                                 </CRow>
                                             </CButton>
@@ -274,6 +332,15 @@ class EnVenta extends Component {
                                 </CCardHeader>
                                 <CCollapse show={this.state.collapse === index}>
                                     <CCardBody>
+                                        <CRow>
+                                            <CCol md="12">
+                                                <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
+                                                    <span>DNI: {venta[0].idComprador.dni}</span>
+                                                    <span> Dirección: {venta[0].idEnvio.direccion}</span>
+                                                    <span>Celular: {venta[0].idEnvio.telefono}</span>
+                                                </CRow>
+                                            </CCol>
+                                        </CRow>
                                         <CRow className="g-0">
                                             {venta.map((prenda, index) => (
                                                 <CCol className="m-0" key={index}>
@@ -329,7 +396,38 @@ class EnVenta extends Component {
                             </CCard>
                                 )
                             }  
-                        
+                        <h3>Reportados</h3>
+                            { this.state.reportados.length > 0 ?
+                                <CCard className="mb-0">
+                                    <CCardHeader>
+                                        <CRow>
+                                            <CCol md="12">
+                                                <CButton
+                                                    block
+                                                    className="text-left m-0 p-0"
+                                                    onClick={() => this.setState({collapse: this.state.collapse === -1 ? null : -1})}
+                                                >
+                                                    <CRow className="m-auto" style={{ justifyContent: 'space-around'}}>
+                                                        <span>Prendas reportadas sin solicitud de envío</span>
+                                                    </CRow>
+                                                </CButton>
+                                            </CCol>
+                                        </CRow>
+                                    </CCardHeader>
+                                    <CCollapse show={this.state.collapse === -1}>
+                                        <CCardBody>
+                                            <CRow className="g-0">
+                                                {this.state.reportados.map((prenda, index) => (
+                                                    <CCol className="m-0" key={index}>
+                                                        <PrendasCardHorizontal modo="enventa" prenda={prenda.prenda[0]}></PrendasCardHorizontal>
+                                                    </CCol>
+                                                ))}
+                                            </CRow>
+                                        </CCardBody>
+                                    </CCollapse>
+                                </CCard>
+                                : null 
+                            }
                     </CCol>
                 </CTabPane>
             </CTabContent>
@@ -356,7 +454,50 @@ class EnVenta extends Component {
             </CModalBody>
             <CModalFooter>
             <CButton color="primary" onClick={this.validatePago} disabled={!this.state.file}>Confirmar Pago</CButton>{' '}
-            <CButton color="secondary" onClick={() => this.setState({validarPago: !this.state.validarPago})}>Reportar</CButton>
+            <CButton color="secondary" onClick={() => this.setState({validarPago: !this.state.validarPago, reportar: true})}>Reportar</CButton>
+            </CModalFooter>
+        </CModal>
+        <CModal 
+            show={this.state.reportar} 
+            onClose={() => this.setState({reportar: !this.state.reportar})}
+            size="lg"
+        >
+            <CModalHeader closeButton>
+                <CModalTitle>Reportar</CModalTitle>
+            </CModalHeader>
+            <CModalBody>
+                    <CCol md='9' className='m-auto'>
+                        <CRow>
+                            <CCol className='mb-2'>
+                                <CFormGroup>
+                                    <CLabel type='text'>Motivo de reporte (solo 250 caracteres). Suba un archivo como evidencia</CLabel>
+                                    <CTextarea 
+                                    name="motivo" 
+                                    id="motivo"
+                                    rows="3"
+                                    placeholder="Indique el motivo" 
+                                    value={this.state.motivo} onChange={this.onChange}
+                                    />
+                                    <span style={{color: 'red'}}>{this.state.error.motivo}</span>
+                                    <span style={{color: 'red'}}>{this.state.error.file}</span>
+                                </CFormGroup>
+                            </CCol>
+                        </CRow>
+                        <CRow>
+                            <CCol  className='mt-2'>
+                            <CFormGroup>
+                                <CInputFile custom id="custom-file-input" onChange={this.onChangeFile}/>
+                                <CLabel htmlFor="custom-file-input" variant="custom-file">
+                                    {this.state.file ? this.state.file.name : "Suba su evidencia..."}
+                                </CLabel>
+                            </CFormGroup>
+                            </CCol>
+                        </CRow>
+                    </CCol>
+                
+            </CModalBody>
+            <CModalFooter>
+                <CButton color="primary" onClick={this.reportar}>Enviar</CButton>
             </CModalFooter>
         </CModal>
         <CModal 
@@ -371,6 +512,7 @@ class EnVenta extends Component {
                 <CFormGroup>
                     <CLabel type='number'>Indicar el precio del delivery</CLabel>
                     <CInput id="precio" placeholder="S/." required />
+                    <span style={{color: 'red'}}>{this.state.error.precio}</span>
                 </CFormGroup>
             </CModalBody>
             <CModalFooter>
@@ -405,11 +547,11 @@ class EnVenta extends Component {
                     <CLabel type='number'>Indicar fecha estimada de envío</CLabel>
                     <CInput type='date' name="fechaEntrega"  required onChange={this.onChangeE}/>
                 </CFormGroup>
-                {this.state.venta.idEnvio ? this.state.venta.idEnvio.tipoEntrega === "1" ? 
+                {this.state.venta.idEnvio && this.state.venta.idEnvio.tipoEntrega === 1 ? 
                 <CFormGroup>
                     <CLabel type='number'>Confirmar dirección agencia</CLabel>
                     <CInput type='text' name="direccion"  required value={this.state.venta.idEnvio.direccion} onChange={this.onChangeE}/>
-                </CFormGroup>: <></>: <></>}
+                </CFormGroup>: null}
             </CModalBody>
             <CModalFooter>
             <CButton color="primary" onClick={this.indicarEnvio} disabled={this.state.venta.idEnvio ? !this.state.venta.idEnvio.fechaEntrega : true}>Confirmar Envio</CButton>
@@ -432,7 +574,7 @@ const mapStateToProps = state => {
   
   const mapDispatchToProps = dispatch => {
     return {
-        ...bindActionCreators(Object.assign({},clothesActions, sellActions), dispatch)
+        ...bindActionCreators(Object.assign({},clothesActions, sellActions, buyerActions), dispatch)
     }
   }
   

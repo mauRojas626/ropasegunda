@@ -10,7 +10,9 @@ import {
     VALIDATE_SHIP,
     PAY_SHIP,
     ENVIAR,
-    CALIFICAR
+    CALIFICAR,
+    GET_QUEJAS,
+    RESOLVER_QUEJA
 } from './actionTypes/venta'
 import { 
     createSell as createSellAPI,
@@ -23,7 +25,9 @@ import {
     validateShip as validateShipAPI,
     payShip as payShipAPI,
     enviar as enviarAPI,
-    calificar as calificarAPI
+    calificar as calificarAPI,
+    getQuejas as getQuejasAPI,
+    resolverQueja as resolverQuejaAPI
 } from '../../api/venta-api'
 
 import ResponseModel from '../../models/ResponseModel'
@@ -43,6 +47,30 @@ const getSell = (id) => async (dispatch) => {
     } catch(e){
         console.log(e);
         console.log('ERROR! '+GET_SELL);
+        console.log(res.status);
+        console.log(res.error);
+    }
+    return dispatch({
+        type: ERROR_SELL,
+        playload: false
+    })
+}
+
+const getQuejas = () => async (dispatch) => {
+    let res = new ResponseModel();
+    try{
+        res = await getQuejasAPI();
+
+        if(!res.error && res.status >= 200 && res.status <= 300){
+
+            return dispatch({
+                type: GET_QUEJAS,
+                playload: res.response
+            })
+        }
+    } catch(e){
+        console.log(e);
+        console.log('ERROR! '+GET_QUEJAS);
         console.log(res.status);
         console.log(res.error);
     }
@@ -275,4 +303,23 @@ const calificar = (sell) => async (dispatch) => {
     }
 }
 
-export { getSell, createSell, updateSell, deleteSell, validateSell, requestShipping, priceShipping, payShip, validateShip, enviar, calificar }
+const resolverQueja = (id) => async (dispatch) => {
+    let res = new ResponseModel();
+    try{
+        res = await resolverQuejaAPI(id);
+        
+        if(!res.error && res.status >= 200 && res.status <= 300){
+            return dispatch({
+                type: RESOLVER_QUEJA,
+                playload: res.response
+            })
+        }
+    } catch(e){
+        console.log(e);
+        console.log('ERROR! '+RESOLVER_QUEJA);
+        console.log(res.status);
+        console.log(res.error);
+    }
+}
+
+export { getSell, createSell, updateSell, deleteSell, validateSell, requestShipping, priceShipping, payShip, validateShip, enviar, calificar, getQuejas, resolverQueja }

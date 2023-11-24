@@ -18,9 +18,10 @@ class NuevaPrenda extends Component {
             removeFiles: [],
             oldFiles: [],
             newFiles: [],
-            categoria: 'Saco',
+            categoria: 'Blusa',
             sexo: 0,
             confirmacion: false,
+            error: {}
         }
     }
 
@@ -87,25 +88,58 @@ class NuevaPrenda extends Component {
         this.setState({ files: updateFiles })
     }
 
-    onSubmit = async () => {
-        
-        const formData = new FormData();
-        const { clothes, size } = this.state;
-        let finalClothes = { ...clothes }
-        finalClothes.idMedida = size 
-        finalClothes.idVendedor = this.props.user.idUsuario
-        finalClothes.deletedFiles = this.state.removeFiles
-        formData.append('clothes', JSON.stringify(finalClothes));
-        this.state.newFiles.forEach((file, index) => {
-            const newFileName = `${Date.now()}_${file.name}`
-            formData.append('files', file, newFileName)    
-        });
-        if(this.state.oldFiles.length <= 0){
-            await this.props.createClothes(formData)
-        } else {
-            await this.props.updateClothes(formData)
+    validateForm = () => {
+        let error = {}
+        const { clothes } = this.state;
+        const { nombre, precio, talla, color, detalle, descripcion } = clothes;
+        if(nombre === ''){
+            error.nombre = 'Ingrese el nombre de la prenda'
         }
-        this.setState({confirmacion: true, clothes: new PrendaModel(), size: new MedidaModel(), files: []})
+        if(precio === '' || precio <= 0 || isNaN(parseFloat(precio))){
+            error.precio = 'Ingrese el precio de la prenda válido'
+        }
+        if(talla === ''){
+            error.talla = 'Ingrese la talla de la prenda'
+        }
+        if(color === ''){
+            error.color = 'Ingrese el color de la prenda'
+        }
+        if(detalle !== 'Ninguno' && descripcion === ''){
+            error.detalle = 'Ingrese la descripción del detalle'
+        }
+        if(this.state.files.length <= 0){
+            error.fotos = '  Ingrese al menos una foto'
+        }
+        this.setState({error: error})
+        return error
+    }
+
+    onSubmit = async () => {
+        let error = this.validateForm()
+        if(Object.keys(error).length === 0){
+            const formData = new FormData();
+            const { clothes, size } = this.state;
+            for (const key in size) {
+                if (size[key] === "") {
+                size[key] = 0;
+                }
+            }
+            let finalClothes = { ...clothes }
+            finalClothes.idMedida = size 
+            finalClothes.idVendedor = this.props.user.idUsuario
+            finalClothes.deletedFiles = this.state.removeFiles
+            formData.append('clothes', JSON.stringify(finalClothes));
+            this.state.newFiles.forEach((file, index) => {
+                const newFileName = `${Date.now()}_${file.name}`
+                formData.append('files', file, newFileName)    
+            });
+            if(this.state.oldFiles.length <= 0){
+                await this.props.createClothes(formData)
+            } else {
+                await this.props.updateClothes(formData)
+            }
+            this.setState({confirmacion: true, clothes: new PrendaModel(), size: new MedidaModel(), files: []})
+        }
     }
 
     render() {
@@ -125,10 +159,12 @@ class NuevaPrenda extends Component {
                     <CFormGroup className="mt-3">
                         <CLabel type='text'>Nombre</CLabel>
                         <CInput id="name" placeholder="Ingrese el nombre de la prenda" required onChange={this.onChange('nombre')} value={this.state.clothes.nombre}/>
+                        <span className="text-danger">{this.state.error.nombre}</span>
                     </CFormGroup>
                     <CFormGroup>
                         <CLabel type='text'>Color</CLabel>
                         <CInput id="color" placeholder="Ingrese el color" required onChange={this.onChange('color')} value={this.state.clothes.color}/>
+                        <span className="text-danger">{this.state.error.color}</span>
                     </CFormGroup>
                     <CFormGroup>
                         <CLabel>Sexo</CLabel>
@@ -193,6 +229,7 @@ class NuevaPrenda extends Component {
                     <CFormGroup className="mt-3">
                         <CLabel type='number'>Precio</CLabel>
                         <CInput id="precio" placeholder="Ingrese el precio de la prenda" required onChange={this.onChange('precio')} value={this.state.clothes.precio}/>
+                        <span className="text-danger">{this.state.error.precio}</span>
                     </CFormGroup>
                     <CFormGroup>
                         <CLabel type='text'>Talla</CLabel>
@@ -201,15 +238,16 @@ class NuevaPrenda extends Component {
                     <CFormGroup>
                         <CLabel>Categoría</CLabel>
                         <CSelect custom name="categoria" id="categoria" onChange={this.onChangeSelect('categoria')} value={this.state.categoria}>
-                        <option value="Saco">Saco</option>
+                        <option value="Accesorios">Accesorios</option>
+                        <option value="Blusa">Blusa</option>
+                        <option value="Casaca">Casaca</option>
+                        <option value="Falda">Falda</option>
                         <option value="Polo">Polo</option>
                         <option value="Pantalón">Pantalón</option>
-                        <option value="Casaca">Casaca</option>
                         <option value="Polera">Polera</option>
+                        <option value="Saco">Saco</option>
                         <option value="Top">Top</option>
                         <option value="Vestido">Vestido</option>
-                        <option value="Blusa">Blusa</option>
-                        <option value="Accesorios">Accesorios</option>
                         <option value="Otros">Otros</option>
                         </CSelect>
                     </CFormGroup>
@@ -241,6 +279,7 @@ class NuevaPrenda extends Component {
             <CRow>
                 <CCol>
                     <span>fotos</span>
+                    <span className="text-danger">{this.state.error.fotos}</span>
                     <CCol xs="12" sm="12" className="m-auto">
                         <FileUpload modo="fotos" newPhoto={this.onAddPhotos} removePhoto={this.onRemovePhoto} fotosOld={this.props.location.state !== undefined ? files : []}></FileUpload>
                     </CCol>
@@ -257,19 +296,21 @@ class NuevaPrenda extends Component {
         </CCol>
         <CModal 
             show={this.state.confirmacion} 
-            onClose={() => this.setState({confirmacion: !this.state.confirmacion})}
+            //onClose={() => this.setState({confirmacion: !this.state.confirmacion})}
             size="sm"
         >
-            <CModalHeader closeButton>
+            <CModalHeader>
             <CModalTitle>Prenda registrada</CModalTitle>
             </CModalHeader>
             <CModalBody>
                 {'Prenda registrada con éxito'}
             </CModalBody>
             <CModalFooter>
-            <CButton color="primary" onClick={() => this.setState({confirmacion: !this.state.confirmacion})}>
-                <Link to={'/en-venta'}>Aceptar</Link>
-            </CButton>
+                <Link to={'/en-venta'}>
+                    <CButton color="primary" onClick={() => this.setState({confirmacion: !this.state.confirmacion})}>
+                        Aceptar
+                    </CButton>
+                </Link>
             </CModalFooter>
         </CModal>
     </>

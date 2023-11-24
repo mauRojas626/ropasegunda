@@ -52,4 +52,12 @@ const calificar = async (sell) => {
     return await apiPost(`sell/calificar`, sell);
 }
 
-export { getSell, createSell, updateSell, deleteSell, validateSell, requestShipping, priceShiping, payShip, validateShip, enviar, calificar } 
+const getQuejas = async () => {
+    return await apiGet(`sell/quejas`);
+}
+
+const resolverQueja = async (id) => {
+    return await apiGet(`sell/resolverQueja/`+id);
+}
+
+export { getSell, createSell, updateSell, deleteSell, validateSell, requestShipping, priceShiping, payShip, validateShip, enviar, calificar, getQuejas, resolverQueja } 

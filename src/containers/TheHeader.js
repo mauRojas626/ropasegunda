@@ -6,7 +6,6 @@ import {
   CHeaderBrand,
   CHeaderNav,
   CHeaderNavItem,
-  CHeaderNavLink,
   CSubheader,
   CBreadcrumbRouter,
   CForm,
@@ -141,27 +140,13 @@ const TheHeader = () => {
       <CHeaderNav className="d-md-down-none mr-auto">
         
         <CHeaderNavItem  className="px-3">
-          <CHeaderNavLink to="/perfil">{user ?  "Bienvenido " + (user.nombre ? user.nombre : "") : "Iniciar Sesión"}</CHeaderNavLink>
+          <h5>{user ?  "Bienvenido/a " + (user.nombre ? user.nombre : "") : "Inicia Sesión para comprar tus prendas"}</h5>
         </CHeaderNavItem>
         
       </CHeaderNav>
-      <CHeaderNav className="d-md-down-none mr-auto">
         
-        <CHeaderNavItem>
-          <CForm inline>
-            <CInput
-              className="mr-2"
-              placeholder="Buscar"
-              size="md"
-            />
-            <CButton color="light" className="my-2 my-sm-0" type="submit">Buscar</CButton>
-          </CForm>
-        </CHeaderNavItem>
-        
-      </CHeaderNav>
-
       <CHeaderNav className="px-3">
-        {user ? <TheHeaderDropdownMssg user={user}/> : <></>}
+        {user ? <TheHeaderDropdownMssg user={user}/> : null}
         <TheHeaderDropdown loginAuth={loginAuth}/>
       </CHeaderNav>
 
