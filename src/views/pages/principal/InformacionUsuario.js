@@ -64,13 +64,13 @@ class InformacionUsuario extends Component {
       error.telefono = "El celular debe contener 9 dígitos"
     }
     if(this.state.usuario.idMedida !== 0){
-      if(!isNaN(parseInt(this.state.usuario.idMedida.cintura))){
+      if(isNaN(parseInt(this.state.usuario.idMedida.cintura))){
         error.cintura = "La cintura debe ser un número"
       }
-      if(!isNaN(parseInt(this.state.usuario.idMedida.busto))){
+      if(isNaN(parseInt(this.state.usuario.idMedida.busto))){
         error.busto = "El busto debe ser un número"
       }
-      if(!isNaN(parseInt(this.state.usuario.idMedida.cadera))){
+      if(isNaN(parseInt(this.state.usuario.idMedida.cadera))){
         error.cadera = "La cadera debe ser un número"
       }
     }
